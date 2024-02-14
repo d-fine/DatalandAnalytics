@@ -1,7 +1,6 @@
 from requests.auth import HTTPBasicAuth
 import requests
 from config import *
-import time
 
 frameworks = {'sme','sfdr','p2p','lksg','heimathafen','eutaxonomy-non-financials','esg-questionnaire'}
 headers = {"Authorization": "Bearer "+PERSONAL_USER_API_KEY}
