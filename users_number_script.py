@@ -1,6 +1,8 @@
 # Script requires port 6789 from the dataland server to be forwarded to the executing machine
 
 import requests
+from time import strftime, localtime
+
 
 from config import *
 
@@ -36,3 +38,15 @@ numberOfTechnicalUsers = 3
 print("We have " + str(len(UnverifiedUsers) - numberOfTechnicalUsers) + " enabled, but unverified users on Dataland")
 print("We have " + str(len(verifiedUsers)) + " enabled and e-mail verified users on Dataland")
 print("We have " + str(len(totalUsers)) + " total signed up users on Dataland")
+
+beforeTimestamp = 1709251200000 #Desired cutoff timestamp in Epoch
+datestring = strftime('%Y-%m-%d', localtime(beforeTimestamp/1000)) #Converting from millisecond epoch to second epoch
+idsSquared = [UnverifiedUsers, verifiedUsers, totalUsers]
+for ids in idsSquared:
+    for id in ids:
+        if id['createdTimestamp']>beforeTimestamp:
+            ids.remove(id)
+
+print("At "+datestring+" we had " + str(len(UnverifiedUsers) - numberOfTechnicalUsers) + " enabled, but unverified users on Dataland")
+print("At "+datestring+" we had "+ str(len(verifiedUsers)) + " enabled and e-mail verified users on Dataland")
+print("At "+datestring+" we had "+ str(len(totalUsers)) + " total signed up users on Dataland")
