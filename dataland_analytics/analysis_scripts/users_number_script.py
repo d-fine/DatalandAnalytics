@@ -4,7 +4,7 @@ import requests
 from time import strftime, localtime
 
 
-from config import *
+from dataland_analytics.config import *
 
 token_url = 'http://dataland-admin:6789/keycloak/realms/master/protocol/openid-connect/token'
 body = {'grant_type': 'password', 'username': KEYCLOAK_USERNAME, 'password': KEYCLOAK_PASSWORD,

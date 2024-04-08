@@ -3,7 +3,7 @@
 from requests.auth import HTTPBasicAuth
 import requests
 
-from config import *
+from dataland_analytics.config import *
 
 token_url='http://dataland-admin:6789/keycloak/realms/master/protocol/openid-connect/token'
 body={'grant_type':'password','username':KEYCLOAK_USERNAME,'password':KEYCLOAK_PASSWORD,'client_id':'admin-cli','client_secret':''}

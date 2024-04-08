@@ -1,6 +1,6 @@
 from requests.auth import HTTPBasicAuth
 import requests
-from config import *
+from dataland_analytics.config import *
 from collections import Counter
 
 
