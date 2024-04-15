@@ -21,7 +21,7 @@ pip install -e .
    * Navigate to the [datasets folder](api_clients/datasets_api/) and execute 
 
       ```
-	  openapi-generator-cli generate -g python -i ./datasets_open_api.yaml --additional-properties=packageName=dataland-datasets
+	  openapi-generator-cli generate -g python -i ./datasets_open_api.yaml --additional-properties=packageName=dataland_datasets
 	  ```
 
    * After generation, change the package `NAME` in the [setup.py](api_clients/datasets_api/setup.py) file from `openapi-client` to `dataland_datasets_client`
