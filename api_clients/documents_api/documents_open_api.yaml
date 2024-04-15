@@ -1,0 +1,224 @@
+---
+openapi: 3.0.1
+info:
+  title: Dataland Document Manager API documentation
+  version: 1.0.0
+servers:
+- url: "/documents"
+tags:
+- name: Actuator
+  description: Monitor and interact
+  externalDocs:
+    description: Spring Boot Actuator Web API Documentation
+    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+paths:
+  "/":
+    post:
+      tags:
+      - document-controller
+      summary: Upload a document.
+      description: Upload a document and receive meta information
+      operationId: postDocument
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - document
+              type: object
+              properties:
+                document:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successfully uploaded document.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DocumentUploadResponse"
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  "/{documentId}":
+    get:
+      tags:
+      - document-controller
+      summary: Receive a document.
+      description: Receive a document by its ID from internal storage.
+      operationId: getDocument
+      parameters:
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully received document.
+          headers:
+            Content-Disposition:
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            application/vnd.oasis.opendocument.spreadsheet:
+              schema:
+                type: string
+                format: binary
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+    head:
+      tags:
+      - document-controller
+      summary: Check if a document exists.
+      description: Check for a given document ID (hash) if the document already exists
+        in the database.
+      operationId: checkDocument
+      parameters:
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully checked document existence.
+        '404':
+          description: Successfully checked that a document does not exist.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  "/actuator":
+    get:
+      tags:
+      - Actuator
+      summary: Actuator root web endpoint
+      operationId: links
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    "$ref": "#/components/schemas/Link"
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    "$ref": "#/components/schemas/Link"
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    "$ref": "#/components/schemas/Link"
+  "/actuator/info":
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'info'
+      operationId: info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  "/actuator/health":
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'health'
+      operationId: health
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  "/actuator/health/**":
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'health-path'
+      operationId: health-path
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    DocumentUploadResponse:
+      required:
+      - documentId
+      type: object
+      properties:
+        documentId:
+          type: string
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+        templated:
+          type: boolean
+  securitySchemes:
+    default-bearer-auth:
+      type: http
+      in: header
+      scheme: bearer
+    default-oauth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
+          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          scopes: {}
