@@ -46,7 +46,6 @@ with dataland_datasets.ApiClient(datasets_configuration) as api_client:
 #For each request replace user id with name for readability
 for request in all_sfdr_requests:
 	url = url_stub+'users/'+request.user_id
-	# params = {"id":request.user_id}
 	resp = requests.get(url=url,headers=headers).json()
 	try:
 		request.user_id =resp['firstName']+" "+resp['lastName']+" "+resp["email"]
