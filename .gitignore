@@ -1,4 +1,13 @@
-
+# Generated code for API clients
+api_clients/requests_api/*
+api_clients/requests_api/*/
+!/api_clients/requests_api/requests_open_api.yaml
+api_clients/datasets_api/*
+api_clients/datasets_api/*/
+!/api_clients/datasets_api/datasets_open_api.yaml
+api_clients/documents_api/*
+api_clients/documents_api/*/
+!/api_clients/documents_api/documents_open_api.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
