@@ -1,45 +1,44 @@
----
 openapi: 3.0.1
 info:
   title: Dataland QA Service API documentation
   version: 1.0.0
 servers:
-- url: "/qa"
+  - url: /qa
 tags:
-- name: Actuator
-  description: Monitor and interact
-  externalDocs:
-    description: Spring Boot Actuator Web API Documentation
-    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+  - name: Actuator
+    description: Monitor and interact
+    externalDocs:
+      description: Spring Boot Actuator Web API Documentation
+      url: 'https://docs.spring.io/spring-boot/docs/current/actuator-api/html/'
 paths:
-  "/datasets/{dataId}":
+  '/datasets/{dataId}':
     post:
       tags:
-      - qa-controller
+        - qa-controller
       summary: Assign a quality status to a unreviewed dataset
       description: Set the quality status after a dataset has been reviewed
       operationId: assignQaStatus
       parameters:
-      - name: dataId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: qaStatus
-        in: query
-        required: true
-        schema:
-          "$ref": "#/components/schemas/QaStatus"
+        - name: dataId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: qaStatus
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/QaStatus'
       responses:
         '200':
           description: Successfully assigned quality status to dataset.
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/datasets":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /datasets:
     get:
       tags:
-      - qa-controller
+        - qa-controller
       summary: Get unreviewed datasets IDs.
       description: Gets a ordered list of dataset IDs which need to be reviewed
       operationId: getUnreviewedDatasetsIds
@@ -53,12 +52,12 @@ paths:
                 items:
                   type: string
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/actuator":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /actuator:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator root web endpoint
       operationId: links
       responses:
@@ -71,25 +70,25 @@ paths:
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
-  "/actuator/info":
+                    $ref: '#/components/schemas/Link'
+  /actuator/info:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'info'
       operationId: info
       responses:
@@ -105,10 +104,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health":
+  /actuator/health:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health'
       operationId: health
       responses:
@@ -124,10 +123,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health/**":
+  /actuator/health/**:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health-path'
       operationId: health-path
       responses:
@@ -148,9 +147,9 @@ components:
     QaStatus:
       type: string
       enum:
-      - Pending
-      - Accepted
-      - Rejected
+        - Pending
+        - Accepted
+        - Rejected
     Link:
       type: object
       properties:
@@ -167,6 +166,6 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
-          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          authorizationUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/auth
+          tokenUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/token
           scopes: {}

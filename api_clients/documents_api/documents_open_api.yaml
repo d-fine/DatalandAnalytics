@@ -1,21 +1,20 @@
----
 openapi: 3.0.1
 info:
   title: Dataland Document Manager API documentation
   version: 1.0.0
 servers:
-- url: "/documents"
+  - url: /documents
 tags:
-- name: Actuator
-  description: Monitor and interact
-  externalDocs:
-    description: Spring Boot Actuator Web API Documentation
-    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+  - name: Actuator
+    description: Monitor and interact
+    externalDocs:
+      description: Spring Boot Actuator Web API Documentation
+      url: 'https://docs.spring.io/spring-boot/docs/current/actuator-api/html/'
 paths:
-  "/":
+  /:
     post:
       tags:
-      - document-controller
+        - document-controller
       summary: Upload a document.
       description: Upload a document and receive meta information
       operationId: postDocument
@@ -24,7 +23,7 @@ paths:
           multipart/form-data:
             schema:
               required:
-              - document
+                - document
               type: object
               properties:
                 document:
@@ -36,23 +35,23 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/DocumentUploadResponse"
+                $ref: '#/components/schemas/DocumentUploadResponse'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/{documentId}":
+        - default-oauth: []
+        - default-bearer-auth: []
+  '/{documentId}':
     get:
       tags:
-      - document-controller
+        - document-controller
       summary: Receive a document.
       description: Receive a document by its ID from internal storage.
       operationId: getDocument
       parameters:
-      - name: documentId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully received document.
@@ -83,33 +82,34 @@ paths:
                 type: string
                 format: binary
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
+        - default-oauth: []
+        - default-bearer-auth: []
     head:
       tags:
-      - document-controller
+        - document-controller
       summary: Check if a document exists.
-      description: Check for a given document ID (hash) if the document already exists
-        in the database.
+      description: >-
+        Check for a given document ID (hash) if the document already exists in
+        the database.
       operationId: checkDocument
       parameters:
-      - name: documentId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully checked document existence.
         '404':
           description: Successfully checked that a document does not exist.
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/actuator":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /actuator:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator root web endpoint
       operationId: links
       responses:
@@ -122,25 +122,25 @@ paths:
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
-  "/actuator/info":
+                    $ref: '#/components/schemas/Link'
+  /actuator/info:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'info'
       operationId: info
       responses:
@@ -156,10 +156,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health":
+  /actuator/health:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health'
       operationId: health
       responses:
@@ -175,10 +175,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health/**":
+  /actuator/health/**:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health-path'
       operationId: health-path
       responses:
@@ -198,7 +198,7 @@ components:
   schemas:
     DocumentUploadResponse:
       required:
-      - documentId
+        - documentId
       type: object
       properties:
         documentId:
@@ -219,6 +219,6 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
-          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          authorizationUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/auth
+          tokenUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/token
           scopes: {}

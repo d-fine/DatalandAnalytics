@@ -1,30 +1,30 @@
----
 openapi: 3.0.1
 info:
   title: Dataland Community Manager API documentation
   version: 1.0.0
 servers:
-- url: "/community"
+  - url: /community
 tags:
-- name: Actuator
-  description: Monitor and interact
-  externalDocs:
-    description: Spring Boot Actuator Web API Documentation
-    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+  - name: Actuator
+    description: Monitor and interact
+    externalDocs:
+      description: Spring Boot Actuator Web API Documentation
+      url: 'https://docs.spring.io/spring-boot/docs/current/actuator-api/html/'
 paths:
-  "/requests/single":
+  /requests/single:
     post:
       tags:
-      - request-controller
+        - request-controller
       summary: Send a single request
-      description: A single of data requests for specific frameworks and companies
-        is being sent.
+      description: >-
+        A single of data requests for specific frameworks and companies is being
+        sent.
       operationId: postSingleDataRequest
       requestBody:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/SingleDataRequest"
+              $ref: '#/components/schemas/SingleDataRequest'
         required: true
       responses:
         '200':
@@ -32,23 +32,24 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SingleDataRequestResponse"
+                $ref: '#/components/schemas/SingleDataRequestResponse'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests/bulk":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /requests/bulk:
     post:
       tags:
-      - request-controller
+        - request-controller
       summary: Send a bulk request
-      description: A bulk of data requests for specific frameworks and companies is
-        being sent.
+      description: >-
+        A bulk of data requests for specific frameworks and companies is being
+        sent.
       operationId: postBulkDataRequest
       requestBody:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/BulkDataRequest"
+              $ref: '#/components/schemas/BulkDataRequest'
         required: true
       responses:
         '200':
@@ -56,81 +57,96 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/BulkDataRequestResponse"
+                $ref: '#/components/schemas/BulkDataRequestResponse'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests/{dataRequestId}/requestStatus":
+        - default-oauth: []
+        - default-bearer-auth: []
+  '/requests/{dataRequestId}/requestStatus':
     patch:
       tags:
-      - request-controller
-      summary: Update status of data request.
-      description: Updates status of data request given data request id.
-      operationId: patchDataRequestStatus
+        - request-controller
+      summary: Updates a data request.
+      description: >-
+        Updates status and message history of data request given data request
+        id.
+      operationId: patchDataRequest
       parameters:
-      - name: dataRequestId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: requestStatus
-        in: query
-        required: true
-        schema:
-          "$ref": "#/components/schemas/RequestStatus"
+        - name: dataRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requestStatus
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/RequestStatus'
+        - name: contacts
+          in: query
+          required: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+        - name: message
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully patched data request.
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/StoredDataRequest"
+                $ref: '#/components/schemas/StoredDataRequest'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /requests:
     get:
       tags:
-      - request-controller
+        - request-controller
       summary: Get all stored data requests based on filters.
       description: Gets all the stored data request based on filters.
       operationId: getDataRequests
       parameters:
-      - name: dataType
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - eutaxonomy-financials
-          - eutaxonomy-non-financials
-          - lksg
-          - p2p
-          - sfdr
-          - sme
-          - esg-questionnaire
-          - heimathafen
-      - name: userId
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: requestStatus
-        in: query
-        required: false
-        schema:
-          "$ref": "#/components/schemas/RequestStatus"
-      - name: reportingPeriod
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: datalandCompanyId
-        in: query
-        required: false
-        schema:
-          type: string
+        - name: dataType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - eutaxonomy-financials
+              - eutaxonomy-non-financials
+              - lksg
+              - p2p
+              - sfdr
+              - sme
+              - esg-questionnaire
+              - heimathafen
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: requestStatus
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/RequestStatus'
+        - name: reportingPeriod
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: datalandCompanyId
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully retrieved data requests
@@ -139,42 +155,44 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/StoredDataRequest"
+                  $ref: '#/components/schemas/StoredDataRequest'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests/{dataRequestId}":
+        - default-oauth: []
+        - default-bearer-auth: []
+  '/requests/{dataRequestId}':
     get:
       tags:
-      - request-controller
+        - request-controller
       summary: Gets a stored data request for a given ID.
-      description: Gets the stored data request corresponding to the provided data
-        request ID.
+      description: >-
+        Gets the stored data request corresponding to the provided data request
+        ID.
       operationId: getDataRequestById
       parameters:
-      - name: dataRequestId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: dataRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Successfully retrieved data request for the provided ID.
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/StoredDataRequest"
+                $ref: '#/components/schemas/StoredDataRequest'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests/user":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /requests/user:
     get:
       tags:
-      - request-controller
+        - request-controller
       summary: Get all stored data requests of the user making the request.
-      description: Gets all the stored data request created by the user who is making
-        the request.
+      description: >-
+        Gets all the stored data request created by the user who is making the
+        request.
       operationId: getDataRequestsForRequestingUser
       responses:
         '200':
@@ -184,51 +202,52 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/ExtendedStoredDataRequest"
+                  $ref: '#/components/schemas/ExtendedStoredDataRequest'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/requests/aggregated":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /requests/aggregated:
     get:
       tags:
-      - request-controller
+        - request-controller
       summary: Get aggregated data requests.
-      description: Gets all data requests that match the given filters, while aggregating
+      description: >-
+        Gets all data requests that match the given filters, while aggregating
         userIDs.
       operationId: getAggregatedDataRequests
       parameters:
-      - name: identifierValue
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: dataTypes
-        in: query
-        required: false
-        schema:
-          uniqueItems: true
-          type: array
-          items:
+        - name: identifierValue
+          in: query
+          required: false
+          schema:
             type: string
-            enum:
-            - eutaxonomy-financials
-            - eutaxonomy-non-financials
-            - lksg
-            - p2p
-            - sfdr
-            - sme
-            - esg-questionnaire
-            - heimathafen
-      - name: reportingPeriod
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: status
-        in: query
-        required: false
-        schema:
-          "$ref": "#/components/schemas/RequestStatus"
+        - name: dataTypes
+          in: query
+          required: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+              enum:
+                - eutaxonomy-financials
+                - eutaxonomy-non-financials
+                - lksg
+                - p2p
+                - sfdr
+                - sme
+                - esg-questionnaire
+                - heimathafen
+        - name: reportingPeriod
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/RequestStatus'
       responses:
         '200':
           description: Successfully retrieved aggregated data requests.
@@ -237,14 +256,14 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/AggregatedDataRequest"
+                  $ref: '#/components/schemas/AggregatedDataRequest'
       security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  "/actuator":
+        - default-oauth: []
+        - default-bearer-auth: []
+  /actuator:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator root web endpoint
       operationId: links
       responses:
@@ -257,25 +276,25 @@ paths:
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
-  "/actuator/info":
+                    $ref: '#/components/schemas/Link'
+  /actuator/info:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'info'
       operationId: info
       responses:
@@ -291,10 +310,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health":
+  /actuator/health:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health'
       operationId: health
       responses:
@@ -310,10 +329,10 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health/**":
+  /actuator/health/**:
     get:
       tags:
-      - Actuator
+        - Actuator
       summary: Actuator web endpoint 'health-path'
       operationId: health-path
       responses:
@@ -333,9 +352,9 @@ components:
   schemas:
     SingleDataRequest:
       required:
-      - companyIdentifier
-      - dataType
-      - reportingPeriods
+        - companyIdentifier
+        - dataType
+        - reportingPeriods
       type: object
       properties:
         companyIdentifier:
@@ -345,36 +364,36 @@ components:
           type: string
           example: p2p
           enum:
-          - eutaxonomy-financials
-          - eutaxonomy-non-financials
-          - lksg
-          - p2p
-          - sfdr
-          - sme
-          - esg-questionnaire
-          - heimathafen
+            - eutaxonomy-financials
+            - eutaxonomy-non-financials
+            - lksg
+            - p2p
+            - sfdr
+            - sme
+            - esg-questionnaire
+            - heimathafen
         reportingPeriods:
           uniqueItems: true
           type: array
           example:
-          - '2022'
-          - '2023'
+            - '2022'
+            - '2023'
           items:
             type: string
         contacts:
           uniqueItems: true
           type: array
           example:
-          - testuser@example.com
+            - testuser@example.com
           items:
             type: string
         message:
           type: string
     SingleDataRequestResponse:
       required:
-      - message
-      - reportingPeriodsOfDuplicateDataRequests
-      - reportingPeriodsOfStoredDataRequests
+        - message
+        - reportingPeriodsOfDuplicateDataRequests
+        - reportingPeriodsOfStoredDataRequests
       type: object
       properties:
         message:
@@ -389,48 +408,48 @@ components:
             type: string
     BulkDataRequest:
       required:
-      - companyIdentifiers
-      - dataTypes
-      - reportingPeriods
+        - companyIdentifiers
+        - dataTypes
+        - reportingPeriods
       type: object
       properties:
         companyIdentifiers:
           uniqueItems: true
           type: array
           example:
-          - enterValidIdentifiers
+            - enterValidIdentifiers
           items:
             type: string
         dataTypes:
           uniqueItems: true
           type: array
           example:
-          - p2p
-          - sme
+            - p2p
+            - sme
           items:
             type: string
             enum:
-            - eutaxonomy-financials
-            - eutaxonomy-non-financials
-            - lksg
-            - p2p
-            - sfdr
-            - sme
-            - esg-questionnaire
-            - heimathafen
+              - eutaxonomy-financials
+              - eutaxonomy-non-financials
+              - lksg
+              - p2p
+              - sfdr
+              - sme
+              - esg-questionnaire
+              - heimathafen
         reportingPeriods:
           uniqueItems: true
           type: array
           example:
-          - '2022'
-          - '2023'
+            - '2022'
+            - '2023'
           items:
             type: string
     BulkDataRequestResponse:
       required:
-      - acceptedCompanyIdentifiers
-      - message
-      - rejectedCompanyIdentifiers
+        - acceptedCompanyIdentifiers
+        - message
+        - rejectedCompanyIdentifiers
       type: object
       properties:
         message:
@@ -446,20 +465,21 @@ components:
     RequestStatus:
       type: string
       enum:
-      - Open
-      - Answered
-      - Closed
+        - Open
+        - Answered
+        - Closed
+        - Withdrawn
     StoredDataRequest:
       required:
-      - creationTimestamp
-      - dataRequestId
-      - dataType
-      - datalandCompanyId
-      - lastModifiedDate
-      - messageHistory
-      - reportingPeriod
-      - requestStatus
-      - userId
+        - creationTimestamp
+        - dataRequestId
+        - dataType
+        - datalandCompanyId
+        - lastModifiedDate
+        - messageHistory
+        - reportingPeriod
+        - requestStatus
+        - userId
       type: object
       properties:
         dataRequestId:
@@ -478,16 +498,16 @@ components:
         messageHistory:
           type: array
           items:
-            "$ref": "#/components/schemas/StoredDataRequestMessageObject"
+            $ref: '#/components/schemas/StoredDataRequestMessageObject'
         lastModifiedDate:
           type: integer
           format: int64
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
     StoredDataRequestMessageObject:
       required:
-      - contacts
-      - creationTimestamp
+        - contacts
+        - creationTimestamp
       type: object
       properties:
         contacts:
@@ -502,16 +522,16 @@ components:
           format: int64
     ExtendedStoredDataRequest:
       required:
-      - companyName
-      - creationTimestamp
-      - dataRequestId
-      - dataType
-      - datalandCompanyId
-      - lastModifiedDate
-      - messageHistory
-      - reportingPeriod
-      - requestStatus
-      - userId
+        - companyName
+        - creationTimestamp
+        - dataRequestId
+        - dataType
+        - datalandCompanyId
+        - lastModifiedDate
+        - messageHistory
+        - reportingPeriod
+        - requestStatus
+        - userId
       type: object
       properties:
         dataRequestId:
@@ -532,36 +552,36 @@ components:
         messageHistory:
           type: array
           items:
-            "$ref": "#/components/schemas/StoredDataRequestMessageObject"
+            $ref: '#/components/schemas/StoredDataRequestMessageObject'
         lastModifiedDate:
           type: integer
           format: int64
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
     AggregatedDataRequest:
       required:
-      - count
-      - datalandCompanyId
-      - requestStatus
+        - count
+        - datalandCompanyId
+        - requestStatus
       type: object
       properties:
         dataType:
           type: string
           enum:
-          - eutaxonomy-financials
-          - eutaxonomy-non-financials
-          - lksg
-          - p2p
-          - sfdr
-          - sme
-          - esg-questionnaire
-          - heimathafen
+            - eutaxonomy-financials
+            - eutaxonomy-non-financials
+            - lksg
+            - p2p
+            - sfdr
+            - sme
+            - esg-questionnaire
+            - heimathafen
         reportingPeriod:
           type: string
         datalandCompanyId:
           type: string
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
         count:
           type: integer
           format: int64
@@ -581,6 +601,6 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
-          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          authorizationUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/auth
+          tokenUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/token
           scopes: {}
