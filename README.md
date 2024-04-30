@@ -25,7 +25,8 @@ pip install -e .
 	  ```
 
    * Install the client to your python environment by running `pip install .` in the [datasets_api folder](api_clients/datasets_api/) after activating your virtual environment
-   * Repeat process for the [documents_api](api_clients/documenta_api) and the [requests_api](api_clients/requests_api/) respectively.
+
+   * Repeat process for the [documents_api](api_clients/documenta_api), the [requests_api](api_clients/requests_api/) and the [qa_api](api_clients/qa_api/) respectively.
 
 4. Generate your api key at https://dataland.com/api-key and put it into [the config file](dataland_analytics/config.py) as `PERSONAL_USER_API_KEY`
 
