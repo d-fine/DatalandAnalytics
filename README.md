@@ -1,10 +1,12 @@
 # DatalandAnalytics
-This repository hosts scripts to perform data anlytics of Dataland.
+This repository hosts scripts to perform data analytics of Dataland.
 For more information about Dataland refer to http://dataland.com and its repository at https://github.com/d-fine/dataland.
 
 The different scripts require different access levels to the application with some only requiring read access to the API whereas others do need elevated rights. These elevated rights cannot be granted to open source collaborators.
 
 ## Installation and execution
+0. (Optional) Make sure the OpenAPI specification files are up-to-date by following the instructions [below](#Update-OpenAPI-Specifications)
+
 1. Create a Python Virtual Environment, activate it and install the requirements:
 ```
 python3 -m venv .venv
