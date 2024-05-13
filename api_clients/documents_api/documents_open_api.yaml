@@ -1,10 +1,9 @@
----
 openapi: 3.0.1
 info:
   title: Dataland Document Manager API documentation
   version: 1.0.0
 servers:
-- url: "/documents"
+- url: /documents
 tags:
 - name: Actuator
   description: Monitor and interact
@@ -12,7 +11,7 @@ tags:
     description: Spring Boot Actuator Web API Documentation
     url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
 paths:
-  "/":
+  /:
     post:
       tags:
       - document-controller
@@ -36,11 +35,11 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/DocumentUploadResponse"
+                $ref: '#/components/schemas/DocumentUploadResponse'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/{documentId}":
+  /{documentId}:
     get:
       tags:
       - document-controller
@@ -99,14 +98,14 @@ paths:
         schema:
           type: string
       responses:
-        '200':
-          description: Successfully checked document existence.
         '404':
           description: Successfully checked that a document does not exist.
+        '200':
+          description: Successfully checked document existence.
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/actuator":
+  /actuator:
     get:
       tags:
       - Actuator
@@ -122,22 +121,22 @@ paths:
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
-  "/actuator/info":
+                    $ref: '#/components/schemas/Link'
+  /actuator/info:
     get:
       tags:
       - Actuator
@@ -156,7 +155,7 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health":
+  /actuator/health:
     get:
       tags:
       - Actuator
@@ -175,7 +174,7 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health/**":
+  /actuator/health/**:
     get:
       tags:
       - Actuator
@@ -219,6 +218,7 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
-          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          authorizationUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/auth
+          tokenUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/token
           scopes: {}
+
