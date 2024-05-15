@@ -1,10 +1,9 @@
----
 openapi: 3.0.1
 info:
   title: Dataland Community Manager API documentation
   version: 1.0.0
 servers:
-- url: "/community"
+- url: /community
 tags:
 - name: Actuator
   description: Monitor and interact
@@ -12,7 +11,7 @@ tags:
     description: Spring Boot Actuator Web API Documentation
     url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
 paths:
-  "/requests/single":
+  /requests/single:
     post:
       tags:
       - request-controller
@@ -24,7 +23,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/SingleDataRequest"
+              $ref: '#/components/schemas/SingleDataRequest'
         required: true
       responses:
         '200':
@@ -32,11 +31,11 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SingleDataRequestResponse"
+                $ref: '#/components/schemas/SingleDataRequestResponse'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests/bulk":
+  /requests/bulk:
     post:
       tags:
       - request-controller
@@ -48,7 +47,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/BulkDataRequest"
+              $ref: '#/components/schemas/BulkDataRequest'
         required: true
       responses:
         '200':
@@ -56,17 +55,18 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/BulkDataRequestResponse"
+                $ref: '#/components/schemas/BulkDataRequestResponse'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests/{dataRequestId}/requestStatus":
+  /requests/{dataRequestId}/requestStatus:
     patch:
       tags:
       - request-controller
-      summary: Update status of data request.
-      description: Updates status of data request given data request id.
-      operationId: patchDataRequestStatus
+      summary: Updates a data request.
+      description: Updates status and message history of data request given data request
+        id.
+      operationId: patchDataRequest
       parameters:
       - name: dataRequestId
         in: path
@@ -76,20 +76,33 @@ paths:
           format: uuid
       - name: requestStatus
         in: query
-        required: true
+        required: false
         schema:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
+      - name: contacts
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+      - name: message
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully patched data request.
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/StoredDataRequest"
+                $ref: '#/components/schemas/StoredDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests":
+  /requests:
     get:
       tags:
       - request-controller
@@ -120,7 +133,7 @@ paths:
         in: query
         required: false
         schema:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
       - name: reportingPeriod
         in: query
         required: false
@@ -139,11 +152,11 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/StoredDataRequest"
+                  $ref: '#/components/schemas/StoredDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests/{dataRequestId}":
+  /requests/{dataRequestId}:
     get:
       tags:
       - request-controller
@@ -164,11 +177,11 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/StoredDataRequest"
+                $ref: '#/components/schemas/StoredDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests/user":
+  /requests/user:
     get:
       tags:
       - request-controller
@@ -184,11 +197,11 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/ExtendedStoredDataRequest"
+                  $ref: '#/components/schemas/ExtendedStoredDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/requests/aggregated":
+  /requests/aggregated:
     get:
       tags:
       - request-controller
@@ -228,7 +241,7 @@ paths:
         in: query
         required: false
         schema:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
       responses:
         '200':
           description: Successfully retrieved aggregated data requests.
@@ -237,11 +250,11 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/AggregatedDataRequest"
+                  $ref: '#/components/schemas/AggregatedDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  "/actuator":
+  /actuator:
     get:
       tags:
       - Actuator
@@ -257,22 +270,22 @@ paths:
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
+                    $ref: '#/components/schemas/Link'
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
-                    "$ref": "#/components/schemas/Link"
-  "/actuator/info":
+                    $ref: '#/components/schemas/Link'
+  /actuator/info:
     get:
       tags:
       - Actuator
@@ -291,7 +304,7 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health":
+  /actuator/health:
     get:
       tags:
       - Actuator
@@ -310,7 +323,7 @@ paths:
             application/json:
               schema:
                 type: object
-  "/actuator/health/**":
+  /actuator/health/**:
     get:
       tags:
       - Actuator
@@ -448,6 +461,8 @@ components:
       enum:
       - Open
       - Answered
+      - Resolved
+      - Withdrawn
       - Closed
     StoredDataRequest:
       required:
@@ -478,12 +493,12 @@ components:
         messageHistory:
           type: array
           items:
-            "$ref": "#/components/schemas/StoredDataRequestMessageObject"
+            $ref: '#/components/schemas/StoredDataRequestMessageObject'
         lastModifiedDate:
           type: integer
           format: int64
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
     StoredDataRequestMessageObject:
       required:
       - contacts
@@ -532,12 +547,12 @@ components:
         messageHistory:
           type: array
           items:
-            "$ref": "#/components/schemas/StoredDataRequestMessageObject"
+            $ref: '#/components/schemas/StoredDataRequestMessageObject'
         lastModifiedDate:
           type: integer
           format: int64
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
     AggregatedDataRequest:
       required:
       - count
@@ -561,7 +576,7 @@ components:
         datalandCompanyId:
           type: string
         requestStatus:
-          "$ref": "#/components/schemas/RequestStatus"
+          $ref: '#/components/schemas/RequestStatus'
         count:
           type: integer
           format: int64
@@ -581,6 +596,7 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/auth"
-          tokenUrl: "/keycloak/realms/datalandsecurity/protocol/openid-connect/token"
+          authorizationUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/auth
+          tokenUrl: /keycloak/realms/datalandsecurity/protocol/openid-connect/token
           scopes: {}
+
