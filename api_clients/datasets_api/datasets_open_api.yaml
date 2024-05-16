@@ -5204,7 +5204,7 @@ components:
         ,\n          \"LGrundstuecksUndWohnungswesen\"\n        ]\n      },\n    \
         \  \"esgBerichte\": {\n        \"nachhaltigkeitsberichte\": \"Yes\",\n   \
         \     \"frequenzDerBerichterstattung\": \"Halbjaehrlich\",\n        \"aktuelleBerichte\"\
-        : [\n          {\n            \"value\": \"Bayer Gesch\xC3\xA4ftsbericht 2022\"\
+        : [\n          {\n            \"value\": \"Bayer Gesch\xE4ftsbericht 2022\"\
         ,\n            \"dataSource\": {\n              \"fileName\": \"Bayer-Geschaeftsbericht-2022\"\
         ,\n              \"fileReference\": \"3bbdc1879acbc211af4b87a8593cfd7523adedd7100ca59326df05f8adbfe881\"\
         \n            }\n          }\n        ]\n      },\n      \"akkreditierungen\"\
@@ -5227,11 +5227,11 @@ components:
         : {\n              \"fileName\": \"Bayer-Geschaeftsbericht-2022\",\n     \
         \         \"fileReference\": \"3bbdc1879acbc211af4b87a8593cfd7523adedd7100ca59326df05f8adbfe881\"\
         \n            }\n          }\n        ],\n        \"erklaerungDerEinhaltungDerOecdLeitsaetze\"\
-        : \"Erkl\xC3\xA4rung der Einhaltung\"\n      },\n      \"sonstige\": {\n \
-        \       \"ausrichtungAufDieUnSdgsUndAktivesVerfolgen\": \"n/a\",\n       \
-        \ \"ausschlusslistenAufBasisVonEsgKriterien\": \"Yes\",\n        \"ausschlusslisten\"\
-        : \"controversial weapons, tobacco, alcohol, gambling, adult entertainment,\
-        \ fossil fuels\"\n      },\n      \"fuehrungsstandards\": {\n        \"oekologischeSozialeFuehrungsstandardsOderPrinzipien\"\
+        : \"Erkl\xE4rung der Einhaltung\"\n      },\n      \"sonstige\": {\n     \
+        \   \"ausrichtungAufDieUnSdgsUndAktivesVerfolgen\": \"n/a\",\n        \"ausschlusslistenAufBasisVonEsgKriterien\"\
+        : \"Yes\",\n        \"ausschlusslisten\": \"controversial weapons, tobacco,\
+        \ alcohol, gambling, adult entertainment, fossil fuels\"\n      },\n     \
+        \ \"fuehrungsstandards\": {\n        \"oekologischeSozialeFuehrungsstandardsOderPrinzipien\"\
         : \"Yes\",\n        \"anreizmechanismenFuerDasManagementUmwelt\": \"JaGeschaeftsleitung\"\
         ,\n        \"anreizmechanismenFuerDasManagementSoziales\": \"JaAufsichtsrat\"\
         \n      },\n      \"rechtsstreitigkeiten\": {\n        \"esgBezogeneRechtsstreitigkeiten\"\
@@ -5352,8 +5352,8 @@ components:
         : \"0\"\n      },\n      \"biodiversitaet\": {\n        \"negativeAktivitaetenFuerDieBiologischeVielfalt\"\
         : \"No\",\n        \"negativeMassnahmenFuerDieBiologischeVielfalt\": null,\n\
         \        \"positiveAktivitaetenFuerDieBiologischeVielfalt\": \"Yes\",\n  \
-        \      \"positiveMassnahmenFuerDieBiologischeVielfalt\": \"Positive Ma\xC3\
-        \u0178nahme\"\n      },\n      \"fossileBrennstoffe\": {\n        \"einnahmenAusFossilenBrennstoffen\"\
+        \      \"positiveMassnahmenFuerDieBiologischeVielfalt\": \"Positive Ma\xDF\
+        nahme\"\n      },\n      \"fossileBrennstoffe\": {\n        \"einnahmenAusFossilenBrennstoffen\"\
         : \"Yes\",\n        \"berichterstattungEinnahmenAusFossilenBrennstoffen\"\
         : {\n          \"currentYear\": 2022,\n          \"yearlyData\": {\n     \
         \       \"2019\": {\n              \"prozentDerEinnahmenAusFossilenBrennstoffen\"\
@@ -5409,10 +5409,10 @@ components:
         : 24\n            },\n            \"2022\": {\n              \"anzahlDerBefristetenVertraege\"\
         : 477,\n              \"fluktuation\": 57\n            }\n          }\n  \
         \      }\n      },\n      \"sicherheitUndWeiterbildung\": {\n        \"sicherheitsmassnahmenFuerMitarbeiter\"\
-        : \"Sicherheitsma\xC3\u0178nahme\",\n        \"unfallrate\": {\n         \
-        \ \"currentYear\": 2023,\n          \"yearlyData\": {\n            \"2019\"\
-        : {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\":\
-        \ null\n            },\n            \"2020\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
+        : \"Sicherheitsma\xDFnahme\",\n        \"unfallrate\": {\n          \"currentYear\"\
+        : 2023,\n          \"yearlyData\": {\n            \"2019\": {\n          \
+        \    \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\": null\n       \
+        \     },\n            \"2020\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : null\n            },\n            \"2021\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : 8\n            },\n            \"2022\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : 3\n            }\n          }\n        },\n        \"budgetFuerSchulungAusbildung\"\
