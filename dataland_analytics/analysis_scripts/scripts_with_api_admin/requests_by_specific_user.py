@@ -6,8 +6,10 @@ import pandas as pd
 import time
 
 user_id = ""
-start_epoch = 1715910891000
-end_epoch = round(time.time() * 1000)
+
+# If only requests of specific time are desired set start and end epoch variables
+# start_epoch = 1715910891000
+# end_epoch = round(time.time() * 1000)
 
 datasets_configuration = dataland_datasets.Configuration(
     host="https://dataland.com/api", access_token=PERSONAL_USER_API_KEY
