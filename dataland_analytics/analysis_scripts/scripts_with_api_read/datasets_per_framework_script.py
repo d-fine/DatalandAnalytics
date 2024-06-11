@@ -4,6 +4,9 @@ from dataland_datasets.models.data_type_enum import DataTypeEnum
 import itertools
 import pandas as pd
 
+pd.options.display.max_columns = 20
+pd.options.display.max_rows = 20
+
 configuration = dataland_datasets.Configuration(
 	host = "https://dataland.com/api",
 	access_token=PERSONAL_USER_API_KEY

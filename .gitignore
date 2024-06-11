@@ -8,6 +8,9 @@ api_clients/datasets_api/*/
 api_clients/documents_api/*
 api_clients/documents_api/*/
 !/api_clients/documents_api/documents_open_api.yaml
+api_clients/qa_api/*
+api_clients/qa_api/*/
+!/api_clients/qa_api/qa_open_api.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
