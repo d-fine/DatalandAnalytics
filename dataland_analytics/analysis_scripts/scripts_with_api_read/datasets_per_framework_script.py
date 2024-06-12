@@ -1,6 +1,5 @@
 import dataland_datasets
 from dataland_analytics.config import *
-from dataland_datasets.models.data_type_enum import DataTypeEnum
 import itertools
 import pandas as pd
 
