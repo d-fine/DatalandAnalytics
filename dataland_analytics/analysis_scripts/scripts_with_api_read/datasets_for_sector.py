@@ -37,7 +37,6 @@ with dataland_datasets.ApiClient(configuration) as api_client:
 	meta_data_api_instance = dataland_datasets.MetaDataControllerApi(api_client)
 	sfdr_meta_data_info = meta_data_api_instance.get_list_of_data_meta_info(show_only_active=True, data_type='sfdr')
 	eu_taxo_meta_data_info = meta_data_api_instance.get_list_of_data_meta_info(show_only_active=True, data_type='eutaxonomy-financials')
-	# TODO: remove [0] limitation
 	all_meta_info = sfdr_meta_data_info + eu_taxo_meta_data_info
 	
 	# Filter for companies that are in the Financials sector
