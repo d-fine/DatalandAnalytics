@@ -5,35 +5,32 @@ For more information about Dataland refer to http://dataland.com and its reposit
 The different scripts require different access levels to the application with some only requiring read access to the API whereas others do need elevated rights. These elevated rights cannot be granted to open source collaborators.
 
 ## Installation and execution
-0. Create a Python Virtual Environment, activate it and install the requirements:
-```
-python3 -m venv .venv
-source .venv/Scripts/activate
-pip install -r requirements.txt
-```
-
-1. (Optional) Make sure the OpenAPI specification files are up-to-date by running `update_api_specs.sh`
-
-2. Install the code base in editable state to ensure that imports are working as expected
-```
-pip install -e .
-```
-
-3. Create and install Python Clients of the Dataland APIs
+1. Create a Python Virtual Environment, activate it and install the requirements:
+   ```
+   python3 -m venv .venv
+   source .venv/Scripts/activate
+   pip install -r requirements.txt
+   ```
+2. (Optional) Make sure the OpenAPI specification files are up-to-date by running `update_api_specs.sh`
+3. Install the code base in editable state to ensure that imports are working as expected
+   ```
+   pip install -e .
+   ```
+4. Create and install Python Clients of the Dataland APIs
    * Install [openapi-generator-cli](https://github.com/OpenAPITools/openapi-generator) on your machine
-   * Navigate to the [datasets folder](api_clients/datasets_api/) and execute 
+   * Navigate to the [datasets folder]( api_clients/datasets_api) and execute 
 
       ```
 	  openapi-generator-cli generate -g python -i ./datasets_open_api.yaml --additional-properties=packageName=dataland_datasets
 	  ```
 
-   * Install the client to your python environment by running `pip install .` in the [datasets_api folder](api_clients/datasets_api/) after activating your virtual environment
+   * Install the client to your python environment by running `pip install .` in the [datasets_api folder]( api_clients/datasets_api) after activating your virtual environment
 
-   * Repeat process for the [documents_api](api_clients/documents_api), the [requests_api](api_clients/requests_api/) and the [qa_api](api_clients/qa_api/) respectively.
+   * Repeat process for the [documents_api](api_clients/documents_api), the [requests_api](api_clients/requests_api) and the [qa_api](api_clients/qa_api) respectively.
 
-4. Generate your api key at https://dataland.com/api-key and put it into [the config file](dataland_analytics/config.py) as `PERSONAL_USER_API_KEY`
-
-5. Execute the analytics scripts found in [this folder](dataland_analytics/analysis_scripts/). Some of them might require additional setup for succesful execution which is described in the script itself
+5. Generate your api key at https://dataland.com/api-key (or e.g. https://clone.dataland.com/api-key for testing purposes) and put it into [the config file](dataland_analytics/config.py) as `PERSONAL_USER_API_KEY`
+6. Execute the analytics scripts found in [this folder](dataland_analytics/analysis_scripts). Some of them might require additional setup for successful execution which is described in the script itself
+   * Be sure to set the host configured in the script to the intended one (e.g. clone.dataland.com or dataland.com, etc.)
 
 If the software stops working on your machine, this might be caused by an update of the Dataland API. If this is the case, you might need to update the API specs as explained below.
 
