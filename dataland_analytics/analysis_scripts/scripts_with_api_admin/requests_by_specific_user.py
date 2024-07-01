@@ -11,12 +11,13 @@ user_id = ""
 # start_epoch = 1715910891000
 # end_epoch = round(time.time() * 1000)
 
+# noinspection PyInterpreter
 datasets_configuration = dataland_datasets.Configuration(
-    host="https://dataland.com/api", access_token=PERSONAL_USER_API_KEY
+    host=DATALAND_SERVER + "api", access_token=PERSONAL_USER_API_KEY
 )
 
 requests_configuration = dataland_requests.Configuration(
-    host="https://dataland.com/community", access_token=PERSONAL_USER_API_KEY
+    host=DATALAND_SERVER + "community", access_token=PERSONAL_USER_API_KEY
 )
 
 result_dicts = []

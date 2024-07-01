@@ -12,7 +12,7 @@ SECTOR = 'Financials'
 RESULT_ROOT = 'C:/temp/dala_dump_dataset_script'
 
 configuration = dataland_datasets.Configuration(
-	host = "https://dataland.com/api",
+	host = DATALAND_SERVER + "api",
 	access_token=PERSONAL_USER_API_KEY
 )
 
