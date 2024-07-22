@@ -92,22 +92,22 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  /data/sme:
+  /data/vsme:
     post:
       tags:
-      - sme-data-controller
-      operationId: postSmeJsonAndDocuments
+      - vsme-data-controller
+      operationId: postVsmeJsonAndDocuments
       requestBody:
         content:
           multipart/form-data:
             schema:
               required:
-              - companyAssociatedSmeData
+              - companyAssociatedVsmeData
               - documents
               type: object
               properties:
-                companyAssociatedSmeData:
-                  $ref: '#/components/schemas/CompanyAssociatedDataSmeData'
+                companyAssociatedVsmeData:
+                  $ref: '#/components/schemas/CompanyAssociatedDataVsmeData'
                 documents:
                   type: array
                   items:
@@ -405,175 +405,6 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
-  /companies/{companyId}/data-ownership-requests:
-    post:
-      tags:
-      - company-data-controller
-      summary: Request data ownership for a company.
-      description: Request data ownership for one of the existing company on Dataland.
-      operationId: postDataOwnershipRequest
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: comment
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Successfully requested data ownership.
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  /companies/{companyId}/data-owners/{userId}:
-    post:
-      tags:
-      - company-data-controller
-      summary: Add a new data owner to a company.
-      description: A new data owner is added to the existing list for the specified
-        company.
-      operationId: postDataOwner
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Successfully added data owner.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompanyDataOwners'
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
-    delete:
-      tags:
-      - company-data-controller
-      summary: Delete a data owner from a specified company.
-      description: An existing data owner is deleted from the existing list for the
-        specified company.
-      operationId: deleteDataOwner
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Successfully deleted data owner.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompanyDataOwners'
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
-    head:
-      tags:
-      - company-data-controller
-      summary: Validation of a user-company combination with regards to data ownership.
-      description: Checks whether a user is data owner of a company.
-      operationId: isUserDataOwnerForCompany
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: The specified user is data owner of the company.
-        '404':
-          description: Either the specified company does not exist on Dataland or
-            the user isn't data owner of that company.
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
-  /companies/{companyId}/data-owners:
-    get:
-      tags:
-      - company-data-controller
-      summary: Retrieve data owner(s) of a company.
-      description: Get a list of data owner(s) for the specified company.
-      operationId: getDataOwners
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '404':
-          description: The specified company does not exist on Dataland.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-        '200':
-          description: Successfully retrieved data owner.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
-    head:
-      tags:
-      - company-data-controller
-      summary: Validation if data owners exists for the specified company.
-      description: Checks whether company has data owners or not
-      operationId: hasCompanyDataOwner
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: The specified company has data owner(s).
-        '404':
-          description: The specified company has no data owner(s) yet
-      security:
-      - default-oauth: []
-      - default-bearer-auth: []
   /companies/identifiers/{identifierType}/{identifier}:
     get:
       tags:
@@ -735,6 +566,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataMetaInformation'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /data/vsme/{dataId}:
+    get:
+      tags:
+      - vsme-data-controller
+      operationId: getCompanyAssociatedVsmeData
+      parameters:
+      - name: dataId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved data set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyAssociatedDataVsmeData'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /data/vsme/documents:
+    get:
+      tags:
+      - vsme-data-controller
+      operationId: getPrivateDocument
+      parameters:
+      - name: dataId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: hash
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully received document.
+          headers:
+            Content-Disposition:
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /data/vsme/companies/{companyId}:
+    get:
+      tags:
+      - vsme-data-controller
+      operationId: getFrameworkDatasetsForCompany
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: showOnlyActive
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: reportingPeriod
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved vsme datasets with meta info.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataAndMetaInformationVsmeData'
       security:
       - default-oauth: []
       - default-bearer-auth: []
@@ -1442,6 +1364,8 @@ components:
           type: boolean
         website:
           type: string
+        parentCompanyLei:
+          type: string
     DataMetaInformation:
       required:
       - companyId
@@ -1491,7 +1415,51 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DataMetaInformation'
-    CompanyAssociatedDataSmeData:
+    Address:
+      required:
+      - city
+      - country
+      type: object
+      properties:
+        streetAndHouseNumber:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+    AreaAdjointness:
+      type: string
+      enum:
+      - In
+      - Near
+    BaseDataPointString:
+      type: object
+      properties:
+        value:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/BaseDocumentReference'
+    BaseDataPointYesNo:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/YesNo'
+        dataSource:
+          $ref: '#/components/schemas/BaseDocumentReference'
+    BaseDocumentReference:
+      required:
+      - fileReference
+      type: object
+      properties:
+        fileName:
+          type: string
+        fileReference:
+          type: string
+    CompanyAssociatedDataVsmeData:
       required:
       - companyId
       - data
@@ -1503,10 +1471,22 @@ components:
         reportingPeriod:
           type: string
         data:
-          $ref: '#/components/schemas/SmeData'
-    ExtendedDataPointBigDecimal:
+          $ref: '#/components/schemas/VsmeData'
+    CompanyReport:
       required:
-      - quality
+      - fileReference
+      type: object
+      properties:
+        fileReference:
+          type: string
+        fileName:
+          type: string
+        publicationDate:
+          type: string
+          format: date
+      example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+        "2023-10-12",}}'
+    ExtendedDataPointBigDecimal:
       type: object
       properties:
         value:
@@ -1531,15 +1511,6 @@ components:
           type: string
         fileReference:
           type: string
-    NaturalHazardsCoveredOptions:
-      type: string
-      enum:
-      - Hail
-      - Wind
-      - Flooding
-      - EarthQuake
-      - Avalanche
-      - Snow
     QualityOptions:
       type: string
       enum:
@@ -1547,151 +1518,388 @@ components:
       - Reported
       - Estimated
       - Incomplete
-      - NA
-    SmeData:
-      required:
-      - general
+    ReleaseMedium:
+      type: string
+      enum:
+      - Air
+      - Soil
+      - Water
+    VsmeBasic:
       type: object
       properties:
-        general:
-          $ref: '#/components/schemas/SmeGeneral'
-        power:
-          $ref: '#/components/schemas/SmePower'
-        insurances:
-          $ref: '#/components/schemas/SmeInsurances'
-    SmeGeneral:
-      required:
-      - basicInformation
+        basisForPreparation:
+          $ref: '#/components/schemas/VsmeBasicBasisForPreparation'
+        practicesForTransitioningTowardsAMoreSustainableEconomy:
+          $ref: '#/components/schemas/VsmeBasicPracticesForTransitioningTowardsAMoreSustainableEconomy'
+        energyAndGreenhousGasEmissions:
+          $ref: '#/components/schemas/VsmeBasicEnergyAndGreenhousGasEmissions'
+        pollutionOfAirWaterSoil:
+          $ref: '#/components/schemas/VsmeBasicPollutionOfAirWaterSoil'
+        biodiversity:
+          $ref: '#/components/schemas/VsmeBasicBiodiversity'
+        water:
+          $ref: '#/components/schemas/VsmeBasicWater'
+        resourceUseCircularEconomyAndWasteManagement:
+          $ref: '#/components/schemas/VsmeBasicResourceUseCircularEconomyAndWasteManagement'
+        workforceGeneralCharacteristics:
+          $ref: '#/components/schemas/VsmeBasicWorkforceGeneralCharacteristics'
+        workforceHealthAndSafety:
+          $ref: '#/components/schemas/VsmeBasicWorkforceHealthAndSafety'
+        workforceRenumerationCollectiveBargainingAndTraining:
+          $ref: '#/components/schemas/VsmeBasicWorkforceRenumerationCollectiveBargainingAndTraining'
+        workersInTheValueChainAffectedCommunitiesConsumersAndEndUsers:
+          $ref: '#/components/schemas/VsmeBasicWorkersInTheValueChainAffectedCommunitiesConsumersAndEndUsers'
+    VsmeBasicBasisForPreparation:
       type: object
       properties:
-        basicInformation:
-          $ref: '#/components/schemas/SmeGeneralBasicInformation'
-        financialInformation:
-          $ref: '#/components/schemas/SmeGeneralFinancialInformation'
-    SmeGeneralBasicInformation:
-      required:
-      - fiscalYearStart
-      - numberOfEmployees
-      - reportingDate
-      - sectors
-      type: object
-      properties:
-        reportingDate:
-          type: string
-          format: date
-        sectors:
+        reportingBasis:
+          $ref: '#/components/schemas/BaseDataPointYesNo'
+        subsidiary:
           type: array
           items:
-            type: string
-        numberOfEmployees:
-          type: integer
-        fiscalYearStart:
-          type: string
-          format: date
+            $ref: '#/components/schemas/VsmeSubsidiary'
         referencedReports:
           type: object
-          example:
-            string:
-              fileReference: string
-              fileName: string
-              isGroupLevel: 'Yes'
-              reportDate: '2023-10-12'
-              currency: string
-    SmeGeneralFinancialInformation:
+          additionalProperties:
+            $ref: '#/components/schemas/CompanyReport'
+          example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+            "2023-10-12",}}'
+    VsmeBasicBiodiversity:
       type: object
       properties:
-        revenueInEur:
-          type: number
-        operatingCostInEur:
-          type: number
-        capitalAssetsInEur:
-          type: number
-    SmeInsurances:
-      type: object
-      properties:
-        naturalHazards:
-          $ref: '#/components/schemas/SmeInsurancesNaturalHazards'
-    SmeInsurancesNaturalHazards:
-      type: object
-      properties:
-        insuranceAgainstNaturalHazards:
-          $ref: '#/components/schemas/YesNo'
-        amountCoveredByInsuranceAgainstNaturalHazardsInEur:
-          type: number
-        naturalHazardsCovered:
+        sitesAndAreas:
           type: array
           items:
-            $ref: '#/components/schemas/NaturalHazardsCoveredOptions'
-    SmePower:
-      type: object
-      properties:
-        investments:
-          $ref: '#/components/schemas/SmePowerInvestments'
-        consumption:
-          $ref: '#/components/schemas/SmePowerConsumption'
-    SmePowerConsumption:
-      type: object
-      properties:
-        powerConsumptionInMwh:
-          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-        powerFromRenewableSources:
-          $ref: '#/components/schemas/YesNo'
-        energyConsumptionHeatingAndHotWaterInMwh:
+            $ref: '#/components/schemas/VsmeSiteAndArea'
+        totalSealedAreaPreviousYearInHectare:
           type: number
-        primaryEnergySourceForHeatingAndHotWater:
-          $ref: '#/components/schemas/SmePowerConsumptionPrimaryEnergySourceForHeatingAndHotWaterOptions'
-        energyConsumptionCoveredByOwnRenewablePowerGeneration:
-          $ref: '#/components/schemas/SmePowerConsumptionEnergyConsumptionCoveredByOwnRenewablePowerGenerationOptions'
-    SmePowerConsumptionEnergyConsumptionCoveredByOwnRenewablePowerGenerationOptions:
-      type: string
-      enum:
-      - LessThan25Percent
-      - Between25And50Percent
-      - Between50And75Percent
-      - Over75Percent
-    SmePowerConsumptionPrimaryEnergySourceForHeatingAndHotWaterOptions:
-      type: string
-      enum:
-      - Oil
-      - Gas
-      - Electric
-      - DistrictHeating
-    SmePowerInvestments:
+        totalSealedAreaReportingYearInHectare:
+          type: number
+        relativeChangeSealedArea:
+          type: number
+        totalNatureOrientedAreaOnSitePreviousYearInHectare:
+          type: number
+        totalNatureOrientedAreaOnSiteReportingYearInHectare:
+          type: number
+        relativeChangeNatureOrientedOnSite:
+          type: number
+        totalNatureOrientedAreaOffSitePreviousYearInHectare:
+          type: number
+        totalNatureOrientedAreaOffSiteReportingYearInHectare:
+          type: number
+        relativeChangeNatureOrientedOffSite:
+          type: number
+        totalUseOfLandPreviousYearInHectare:
+          type: number
+        totalUseOfLandReportingYearInHectare:
+          type: number
+        relativeChangeLandUse:
+          type: number
+    VsmeBasicEnergyAndGreenhousGasEmissions:
       type: object
       properties:
-        investmentsInEnhancingEnergyEfficiency:
-          $ref: '#/components/schemas/SmePowerInvestmentsInvestmentsInEnhancingEnergyEfficiencyOptions'
-    SmePowerInvestmentsInvestmentsInEnhancingEnergyEfficiencyOptions:
+        energyFossilFuelsInMWh:
+          type: number
+        electricityTotalInMWh:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        electricityNonRenewableInMWh:
+          type: number
+        electricityRenewableInMWh:
+          type: number
+        totalEmissionsInTonnesOfCO2Equivalents:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope1EmissionsInTonnesOfCO2Equivalents:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope2EmissionsInTonnesOfCO2Equivalents:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope3EmissionsInTonnesOfCO2Equivalents:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+    VsmeBasicPollutionOfAirWaterSoil:
+      type: object
+      properties:
+        pollutionEmission:
+          type: array
+          items:
+            $ref: '#/components/schemas/VsmePollutionEmission'
+    VsmeBasicPracticesForTransitioningTowardsAMoreSustainableEconomy:
+      type: object
+      properties:
+        undertakenMeasures:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseDataPointString'
+    VsmeBasicResourceUseCircularEconomyAndWasteManagement:
+      type: object
+      properties:
+        totalWeightMaterialsInTonnes:
+          type: number
+        weightRecycledMaterialsInTonnes:
+          type: number
+        percentageRecycledMaterials:
+          type: number
+        weightRecyclableMaterialsInTonnes:
+          type: number
+        percentageRecyclableMaterials:
+          type: number
+        measureWaste:
+          $ref: '#/components/schemas/VsmeBasicResourceusecirculareconomyandwastemanagementMeasureWasteOptions'
+        wasteClassification:
+          type: array
+          items:
+            $ref: '#/components/schemas/VsmeWasteClassificationObject'
+    VsmeBasicResourceusecirculareconomyandwastemanagementMeasureWasteOptions:
       type: string
       enum:
-      - LessThan1Percent
-      - Between1And5Percent
-      - Between5And10Percent
-      - Between10And15Percent
-      - Between15And20Percent
-      - Between20And25Percent
-      - Over25Percent
+      - WeightPreferred
+      - Volume
+    VsmeBasicWater:
+      type: object
+      properties:
+        waterWithdrawalAllSitesInCubicMeters:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        waterWithdrawalStressSitesInCubicMeters:
+          type: number
+        waterDischargeAllSitesInCubicMeters:
+          type: number
+        waterDischargeStressSitesInCubicMeters:
+          type: number
+        rainwaterAllSitesInCubicMeters:
+          type: number
+        rainwaterStressSitesInCubicMeters:
+          type: number
+        waterConsumptionAllSitesInCubicMeters:
+          type: number
+        waterConsumptionStressSitesInCubicMeters:
+          type: number
+    VsmeBasicWorkersInTheValueChainAffectedCommunitiesConsumersAndEndUsers:
+      type: object
+      properties:
+        negativeEffects:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseDataPointString'
+        numberOfConvictions:
+          type: number
+        sumOfFinesInEuro:
+          type: number
+    VsmeBasicWorkforceGeneralCharacteristics:
+      type: object
+      properties:
+        measureEmployees:
+          $ref: '#/components/schemas/VsmeBasicWorkforcegeneralcharacteristicsMeasureEmployeesOptions'
+        numberOfEmployeesInFte:
+          type: number
+        numberOfEmployeesInHeadcount:
+          type: number
+        numberOfTemporaryContractEmployeesInFte:
+          type: number
+        numberOfTemporaryContractEmployeesInHeadcount:
+          type: number
+        numberOfPermanentContractEmployeesInFte:
+          type: number
+        numberOfPermanentContractEmployeesInHeadcount:
+          type: number
+        numberOfMaleEmployeesInFte:
+          type: number
+        numberOfMaleEmployeesInHeadcount:
+          type: number
+        numberFemaleEmployeesInFte:
+          type: number
+        numberOfFemaleEmployeesInHeadcount:
+          type: number
+        numberOfOtherEmployeesInFte:
+          type: number
+        numberOfOtherEmployeesInHeadcount:
+          type: number
+        numberOfNotReportedEmployeesInFte:
+          type: number
+        numberOfNotReportedEmployeesInHeadcount:
+          type: number
+        employeesPerCountry:
+          type: array
+          items:
+            $ref: '#/components/schemas/VsmeEmployeesPerCountry'
+    VsmeBasicWorkforceHealthAndSafety:
+      type: object
+      properties:
+        totalHours:
+          type: number
+        numberOfAccidents:
+          type: integer
+        accidentLevel:
+          type: number
+        numberOfTotalFatalitiesInFte:
+          type: integer
+        numberOfTotalFatalitiesInHeadcount:
+          type: integer
+        numberOfFatalitiesOfAccidentsInFte:
+          type: integer
+        numberOfFatalitiesOfAccidentsInHeadcount:
+          type: integer
+        numberOfHealthFatalitiesInFte:
+          type: integer
+        numberOfHealthFatalitiesInHeadcount:
+          type: integer
+    VsmeBasicWorkforceRenumerationCollectiveBargainingAndTraining:
+      type: object
+      properties:
+        numberOfMinimumWageEmployeesInFte:
+          type: number
+        numberOfMinimumWageEmployeesInHeadcount:
+          type: number
+        percentageOfMinimumWageEmployees:
+          type: number
+        majorityOfMinimumWageEmployees:
+          $ref: '#/components/schemas/YesNo'
+        entryLevelWageInEuro:
+          type: number
+        minimumWageInEuro:
+          type: number
+        wageRatio:
+          type: number
+        payGapBasis:
+          $ref: '#/components/schemas/VsmeBasicWorkforcerenumerationcollectivebargainingandtrainingPayGapBasisOptions'
+        grossPayMaleInEuro:
+          type: number
+        grossPayFemaleInEuro:
+          type: number
+        totalWorkHoursMale:
+          type: number
+        totalWorkHoursFemale:
+          type: number
+        averageWorkHoursMale:
+          type: number
+        averageWorkHoursFemale:
+          type: number
+        averageHourlyPayMaleInEuroPerHour:
+          type: number
+        averageHourlyPayFemaleInEuroPerHour:
+          type: number
+        payGap:
+          type: number
+        numberBargainingAgreementsInFte:
+          type: number
+        numberBargainingAgreementsInHeadcount:
+          type: number
+        ratioBargainingAgreement:
+          type: number
+        totalTrainingHoursMale:
+          type: number
+        totalTrainingHoursFemale:
+          type: number
+        averageTrainingHoursMale:
+          type: number
+        averageTrainingHoursFemale:
+          type: number
+    VsmeBasicWorkforcegeneralcharacteristicsMeasureEmployeesOptions:
+      type: string
+      enum:
+      - FullTimeEquivalents
+      - HeadCount
+    VsmeBasicWorkforcerenumerationcollectivebargainingandtrainingPayGapBasisOptions:
+      type: string
+      enum:
+      - Annual
+      - Weekly
+    VsmeData:
+      type: object
+      properties:
+        basic:
+          $ref: '#/components/schemas/VsmeBasic'
+    VsmeEmployeesPerCountry:
+      required:
+      - country
+      type: object
+      properties:
+        country:
+          type: string
+        numberOfEmployeesInHeadCount:
+          type: integer
+          format: int32
+        numberOfEmployeesInFullTimeEquivalent:
+          type: number
+    VsmePollutionEmission:
+      required:
+      - pollutionType
+      - releaseMedium
+      type: object
+      properties:
+        pollutionType:
+          type: string
+        emissionInKilograms:
+          type: number
+        releaseMedium:
+          $ref: '#/components/schemas/ReleaseMedium'
+    VsmeSiteAndArea:
+      required:
+      - areaAddress
+      - siteAddress
+      - siteName
+      - specificationOfAdjointness
+      type: object
+      properties:
+        siteName:
+          type: string
+        siteAddress:
+          $ref: '#/components/schemas/Address'
+        siteGeocoordinateLongitudeval:
+          type: number
+        siteGeocoordinateLatitude:
+          type: number
+        areaInHectare:
+          type: number
+        biodiversitySensitiveArea:
+          type: string
+        areaAddress:
+          $ref: '#/components/schemas/Address'
+        areaGeocoordinateLongitude:
+          type: number
+        areaGeocoordinateLatitude:
+          type: number
+        specificationOfAdjointness:
+          $ref: '#/components/schemas/AreaAdjointness'
+    VsmeSubsidiary:
+      required:
+      - addressOfSubsidiary
+      - nameOfSubsidiary
+      type: object
+      properties:
+        nameOfSubsidiary:
+          type: string
+        addressOfSubsidiary:
+          $ref: '#/components/schemas/Address'
+    VsmeWasteClassificationObject:
+      required:
+      - typeOfWaste
+      - wasteClassification
+      type: object
+      properties:
+        wasteClassification:
+          $ref: '#/components/schemas/WasteClassifications'
+        typeOfWaste:
+          type: string
+        totalAmountOfWasteInTonnes:
+          type: number
+        wasteRecycleOrReuseInTonnes:
+          type: number
+        wasteDisposalInTonnes:
+          type: number
+        totalAmountOfWasteInCubicMeters:
+          type: number
+        wasteRecycleOrReuseInCubicMeters:
+          type: number
+        wasteDisposalInCubicMeters:
+          type: number
+    WasteClassifications:
+      type: string
+      enum:
+      - NonHazardous
+      - Hazardous
     YesNo:
       type: string
       enum:
       - 'Yes'
       - 'No'
-    BaseDataPointYesNo:
-      type: object
-      properties:
-        value:
-          $ref: '#/components/schemas/YesNo'
-        dataSource:
-          $ref: '#/components/schemas/BaseDocumentReference'
-    BaseDocumentReference:
-      required:
-      - fileReference
-      type: object
-      properties:
-        fileName:
-          type: string
-        fileReference:
-          type: string
     CompanyAssociatedDataSfdrData:
       required:
       - companyId
@@ -1706,8 +1914,6 @@ components:
         data:
           $ref: '#/components/schemas/SfdrData'
     CurrencyDataPoint:
-      required:
-      - quality
       type: object
       properties:
         value:
@@ -1721,8 +1927,6 @@ components:
         currency:
           type: string
     ExtendedDataPointBigInteger:
-      required:
-      - quality
       type: object
       properties:
         value:
@@ -1733,13 +1937,11 @@ components:
           type: string
         dataSource:
           $ref: '#/components/schemas/ExtendedDocumentReference'
-    ExtendedDataPointYesNo:
-      required:
-      - quality
+    ExtendedDataPointYesNoNoEvidenceFound:
       type: object
       properties:
         value:
-          $ref: '#/components/schemas/YesNo'
+          $ref: '#/components/schemas/YesNoNoEvidenceFound'
         quality:
           $ref: '#/components/schemas/QualityOptions'
         comment:
@@ -1776,13 +1978,27 @@ components:
       type: object
       properties:
         primaryForestAndWoodedLandOfNativeSpeciesExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         protectedAreasExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         rareOrEndangeredEcosystemsExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         highlyBiodiverseGrasslandExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        manufactureOfAgrochemicalPesticidesProducts:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        landDegradationDesertificationSoilSealingExposure:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        sustainableAgriculturePolicy:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        sustainableOceansAndSeasPolicy:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        threatenedSpeciesExposure:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        biodiversityProtectionPolicy:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+        deforestationPolicy:
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
     SfdrEnvironmentalEmissions:
       type: object
       properties:
@@ -1793,7 +2009,7 @@ components:
         emissionsOfOzoneDepletionSubstancesInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         carbonReductionInitiatives:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
     SfdrEnvironmentalEnergyPerformance:
       type: object
       properties:
@@ -2022,6 +2238,10 @@ components:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         scope1And2And3GhgEmissionsInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope1And2And3GhgEmissionsLocationBasedInTonnes:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope1And2And3GhgEmissionsMarketBasedInTonnes:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         enterpriseValue:
           $ref: '#/components/schemas/CurrencyDataPoint'
         totalRevenue:
@@ -2031,28 +2251,14 @@ components:
         ghgIntensityInTonnesPerMillionEURRevenue:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         fossilFuelSectorExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
     SfdrEnvironmentalWaste:
       type: object
       properties:
         hazardousAndRadioactiveWasteInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-        manufactureOfAgrochemicalPesticidesProducts:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
-        landDegradationDesertificationSoilSealingExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
-        sustainableAgriculturePolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
-        sustainableOceansAndSeasPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
         nonRecycledWasteInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-        threatenedSpeciesExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
-        biodiversityProtectionPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
-        deforestationPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
     SfdrEnvironmentalWater:
       type: object
       properties:
@@ -2065,9 +2271,9 @@ components:
         relativeWaterUsageInCubicMetersPerMillionEURRevenue:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         waterManagementPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         highWaterStressAreaExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
     SfdrGeneral:
       required:
       - general
@@ -2092,15 +2298,10 @@ components:
           format: date
         referencedReports:
           type: object
-          example:
-            string:
-              fileReference: string
-              fileName: string
-              isGroupLevel: 'Yes'
-              reportDate: '2023-10-12'
-              currency: string
-        scopeOfEntities:
-          $ref: '#/components/schemas/YesNoNa'
+          additionalProperties:
+            $ref: '#/components/schemas/CompanyReport'
+          example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+            "2023-10-12",}}'
     SfdrGeneralGeneralFiscalYearDeviationOptions:
       type: string
       enum:
@@ -2309,59 +2510,59 @@ components:
       type: object
       properties:
         securitiesNotCertifiedAsGreen:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
     SfdrSocialHumanRights:
       type: object
       properties:
         humanRightsPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         humanRightsDueDiligence:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         traffickingInHumanBeingsPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         reportedChildLabourIncidents:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         reportedForcedOrCompulsoryLabourIncidents:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         numberOfReportedIncidentsOfHumanRightsViolations:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
     SfdrSocialSocialAndEmployeeMatters:
       type: object
       properties:
         humanRightsLegalProceedings:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         iloCoreLabourStandards:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         environmentalPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         corruptionLegalProceedings:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         transparencyDisclosurePolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         humanRightsDueDiligencePolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         policyAgainstChildLabour:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         policyAgainstForcedLabour:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         policyAgainstDiscriminationInTheWorkplace:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         iso14001Certificate:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         policyAgainstBriberyAndCorruption:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         fairBusinessMarketingAdvertisingPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         technologiesExpertiseTransferPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         fairCompetitionPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         violationOfTaxRulesAndRegulation:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         unGlobalCompactPrinciplesCompliancePolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         oecdGuidelinesForMultinationalEnterprisesGrievanceHandling:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         averageGrossHourlyEarningsMaleEmployees:
           $ref: '#/components/schemas/CurrencyDataPoint'
         averageGrossHourlyEarningsFemaleEmployees:
@@ -2375,19 +2576,19 @@ components:
         boardGenderDiversityInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         controversialWeaponsExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         workplaceAccidentPreventionPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         rateOfAccidentsInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         workdaysLostInDays:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         supplierCodeOfConduct:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         grievanceHandlingMechanism:
-          $ref: '#/components/schemas/ExtendedDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         whistleblowerProtectionPolicy:
-          $ref: '#/components/schemas/BaseDataPointYesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
         reportedIncidentsOfDiscrimination:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
         sanctionedIncidentsOfDiscrimination:
@@ -2396,12 +2597,12 @@ components:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         excessiveCeoPayRatioInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-    YesNoNa:
+    YesNoNoEvidenceFound:
       type: string
       enum:
       - 'Yes'
       - 'No'
-      - NA
+      - NoEvidenceFound
     CompanyAssociatedDataPathwaysToParisData:
       required:
       - companyId
@@ -2835,22 +3036,6 @@ components:
           $ref: '#/components/schemas/P2pLivestockFarming'
         cement:
           $ref: '#/components/schemas/P2pCement'
-    Address:
-      required:
-      - city
-      - country
-      type: object
-      properties:
-        streetAndHouseNumber:
-          type: string
-        postalCode:
-          type: string
-        city:
-          type: string
-        state:
-          type: string
-        country:
-          type: string
     AmountWithCurrency:
       type: object
       properties:
@@ -3649,13 +3834,12 @@ components:
       - HighPricePressure
       - TightlyTimedOrShortTermAdjustedDeliveryDeadlinesAndConditionsWithSuppliers
       - NoneOfTheAbove
-    BaseDataPointString:
-      type: object
-      properties:
-        value:
-          type: string
-        dataSource:
-          $ref: '#/components/schemas/BaseDocumentReference'
+    YesNoNa:
+      type: string
+      enum:
+      - 'Yes'
+      - 'No'
+      - NA
     CompanyAssociatedDataHeimathafenData:
       required:
       - companyId
@@ -4767,13 +4951,10 @@ components:
           type: number
         referencedReports:
           type: object
-          example:
-            string:
-              fileReference: string
-              fileName: string
-              isGroupLevel: 'Yes'
-              reportDate: '2023-10-12'
-              currency: string
+          additionalProperties:
+            $ref: '#/components/schemas/CompanyReport'
+          example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+            "2023-10-12",}}'
     EutaxonomyNonFinancialsGeneralFiscalYearDeviationOptions:
       type: string
       enum:
@@ -4929,29 +5110,6 @@ components:
           type: string
         data:
           $ref: '#/components/schemas/EuTaxonomyDataForFinancials'
-    CompanyReport:
-      required:
-      - fileReference
-      type: object
-      properties:
-        fileReference:
-          type: string
-        fileName:
-          type: string
-        isGroupLevel:
-          $ref: '#/components/schemas/YesNoNa'
-        reportDate:
-          type: string
-          format: date
-        currency:
-          type: string
-      example:
-        string:
-          fileReference: string
-          fileName: string
-          isGroupLevel: 'Yes'
-          reportDate: '2023-10-12'
-          currency: string
     CreditInstitutionKpis:
       type: object
       properties:
@@ -5099,13 +5257,8 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/CompanyReport'
-          example:
-            string:
-              fileReference: string
-              fileName: string
-              isGroupLevel: 'Yes'
-              reportDate: '2023-10-12'
-              currency: string
+          example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+            "2023-10-12",}}'
     FiscalYearDeviation:
       type: string
       enum:
@@ -5204,7 +5357,7 @@ components:
         ,\n          \"LGrundstuecksUndWohnungswesen\"\n        ]\n      },\n    \
         \  \"esgBerichte\": {\n        \"nachhaltigkeitsberichte\": \"Yes\",\n   \
         \     \"frequenzDerBerichterstattung\": \"Halbjaehrlich\",\n        \"aktuelleBerichte\"\
-        : [\n          {\n            \"value\": \"Bayer Gesch\xE4ftsbericht 2022\"\
+        : [\n          {\n            \"value\": \"Bayer Gesch\xC3\xA4ftsbericht 2022\"\
         ,\n            \"dataSource\": {\n              \"fileName\": \"Bayer-Geschaeftsbericht-2022\"\
         ,\n              \"fileReference\": \"3bbdc1879acbc211af4b87a8593cfd7523adedd7100ca59326df05f8adbfe881\"\
         \n            }\n          }\n        ]\n      },\n      \"akkreditierungen\"\
@@ -5227,11 +5380,11 @@ components:
         : {\n              \"fileName\": \"Bayer-Geschaeftsbericht-2022\",\n     \
         \         \"fileReference\": \"3bbdc1879acbc211af4b87a8593cfd7523adedd7100ca59326df05f8adbfe881\"\
         \n            }\n          }\n        ],\n        \"erklaerungDerEinhaltungDerOecdLeitsaetze\"\
-        : \"Erkl\xE4rung der Einhaltung\"\n      },\n      \"sonstige\": {\n     \
-        \   \"ausrichtungAufDieUnSdgsUndAktivesVerfolgen\": \"n/a\",\n        \"ausschlusslistenAufBasisVonEsgKriterien\"\
-        : \"Yes\",\n        \"ausschlusslisten\": \"controversial weapons, tobacco,\
-        \ alcohol, gambling, adult entertainment, fossil fuels\"\n      },\n     \
-        \ \"fuehrungsstandards\": {\n        \"oekologischeSozialeFuehrungsstandardsOderPrinzipien\"\
+        : \"Erkl\xC3\xA4rung der Einhaltung\"\n      },\n      \"sonstige\": {\n \
+        \       \"ausrichtungAufDieUnSdgsUndAktivesVerfolgen\": \"n/a\",\n       \
+        \ \"ausschlusslistenAufBasisVonEsgKriterien\": \"Yes\",\n        \"ausschlusslisten\"\
+        : \"controversial weapons, tobacco, alcohol, gambling, adult entertainment,\
+        \ fossil fuels\"\n      },\n      \"fuehrungsstandards\": {\n        \"oekologischeSozialeFuehrungsstandardsOderPrinzipien\"\
         : \"Yes\",\n        \"anreizmechanismenFuerDasManagementUmwelt\": \"JaGeschaeftsleitung\"\
         ,\n        \"anreizmechanismenFuerDasManagementSoziales\": \"JaAufsichtsrat\"\
         \n      },\n      \"rechtsstreitigkeiten\": {\n        \"esgBezogeneRechtsstreitigkeiten\"\
@@ -5352,8 +5505,8 @@ components:
         : \"0\"\n      },\n      \"biodiversitaet\": {\n        \"negativeAktivitaetenFuerDieBiologischeVielfalt\"\
         : \"No\",\n        \"negativeMassnahmenFuerDieBiologischeVielfalt\": null,\n\
         \        \"positiveAktivitaetenFuerDieBiologischeVielfalt\": \"Yes\",\n  \
-        \      \"positiveMassnahmenFuerDieBiologischeVielfalt\": \"Positive Ma\xDF\
-        nahme\"\n      },\n      \"fossileBrennstoffe\": {\n        \"einnahmenAusFossilenBrennstoffen\"\
+        \      \"positiveMassnahmenFuerDieBiologischeVielfalt\": \"Positive Ma\xC3\
+        \u0178nahme\"\n      },\n      \"fossileBrennstoffe\": {\n        \"einnahmenAusFossilenBrennstoffen\"\
         : \"Yes\",\n        \"berichterstattungEinnahmenAusFossilenBrennstoffen\"\
         : {\n          \"currentYear\": 2022,\n          \"yearlyData\": {\n     \
         \       \"2019\": {\n              \"prozentDerEinnahmenAusFossilenBrennstoffen\"\
@@ -5409,10 +5562,10 @@ components:
         : 24\n            },\n            \"2022\": {\n              \"anzahlDerBefristetenVertraege\"\
         : 477,\n              \"fluktuation\": 57\n            }\n          }\n  \
         \      }\n      },\n      \"sicherheitUndWeiterbildung\": {\n        \"sicherheitsmassnahmenFuerMitarbeiter\"\
-        : \"Sicherheitsma\xDFnahme\",\n        \"unfallrate\": {\n          \"currentYear\"\
-        : 2023,\n          \"yearlyData\": {\n            \"2019\": {\n          \
-        \    \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\": null\n       \
-        \     },\n            \"2020\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
+        : \"Sicherheitsma\xC3\u0178nahme\",\n        \"unfallrate\": {\n         \
+        \ \"currentYear\": 2023,\n          \"yearlyData\": {\n            \"2019\"\
+        : {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\":\
+        \ null\n            },\n            \"2020\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : null\n            },\n            \"2021\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : 8\n            },\n            \"2022\": {\n              \"haeufigkeitsrateVonArbeitsunfaellenMitZeitverlust\"\
         : 3\n            }\n          }\n        },\n        \"budgetFuerSchulungAusbildung\"\
@@ -6193,18 +6346,6 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/UnfallrateValues'
-    CompanyDataOwners:
-      required:
-      - companyId
-      - dataOwners
-      type: object
-      properties:
-        companyId:
-          type: string
-        dataOwners:
-          type: array
-          items:
-            type: string
     CompanyInformationPatch:
       type: object
       properties:
@@ -6240,6 +6381,8 @@ components:
         isTeaserCompany:
           type: boolean
         website:
+          type: string
+        parentCompanyLei:
           type: string
     IdentifierType:
       type: string
@@ -6279,6 +6422,16 @@ components:
         uploadTime:
           type: integer
           format: int64
+    DataAndMetaInformationVsmeData:
+      required:
+      - data
+      - metaInfo
+      type: object
+      properties:
+        metaInfo:
+          $ref: '#/components/schemas/DataMetaInformation'
+        data:
+          $ref: '#/components/schemas/VsmeData'
     DataAndMetaInformationSfdrData:
       required:
       - data
@@ -6359,15 +6512,15 @@ components:
       properties:
         lei:
           type: string
-        sector:
-          type: string
-        companyId:
-          type: string
         companyName:
           type: string
         headquarters:
           type: string
         countryCode:
+          type: string
+        sector:
+          type: string
+        companyId:
           type: string
     AggregatedFrameworkDataSummary:
       required:
@@ -6383,9 +6536,9 @@ components:
       - companyName
       type: object
       properties:
-        companyId:
-          type: string
         companyName:
+          type: string
+        companyId:
           type: string
     CompanyAvailableDistinctValues:
       required:
@@ -6425,7 +6578,7 @@ components:
       - lksg
       - p2p
       - sfdr
-      - sme
+      - vsme
       - esg-questionnaire
       - heimathafen
   securitySchemes:
