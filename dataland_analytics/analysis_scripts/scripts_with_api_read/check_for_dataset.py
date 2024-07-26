@@ -19,10 +19,10 @@ with dataland_datasets.ApiClient(configuration) as api_client:
     company_controller_api_instance = dataland_datasets.CompanyDataControllerApi(
         api_client
     )
-    list_of_dicts = []
+    company_dicts = []
     for company_id in company_ids:
         company_info = company_controller_api_instance.get_company_by_id(company_id)
-        list_of_dicts.append(
+        company_dicts.append(
             {
                 "company_name": company_info.company_information.company_name,
                 "LEI": company_info.company_information.identifiers["Lei"][0],
@@ -30,7 +30,7 @@ with dataland_datasets.ApiClient(configuration) as api_client:
             }
         )
 
-df = pd.DataFrame.from_records(list_of_dicts)
+df = pd.DataFrame.from_records(company_dicts)
 df.to_csv("list_of_companies.csv", index=False, header=True)
 
 no_data = []
@@ -39,19 +39,19 @@ data_2023 = []
 
 with dataland_datasets.ApiClient(configuration) as api_client:
     sfdr_data_api_instance = dataland_datasets.SfdrDataControllerApi(api_client)
-    for dict in list_of_dicts:
+    for company_dict in company_dicts:
         sfdr_data_sets = sfdr_data_api_instance.get_all_company_sfdr_data(
-            company_id=dict["company_id"], show_only_active=True
+            company_id=company_dict["company_id"], show_only_active=True
         )
         if len(sfdr_data_sets) == 0:
-            no_data.append(dict)
+            no_data.append(company_dict)
             continue
         for data_set in sfdr_data_sets:
             if data_set.meta_info.reporting_period == "2023":
-                data_2023.append(dict)
+                data_2023.append(company_dict)
                 continue
             if data_set.meta_info.reporting_period == "2022":
-                data_2022.append(dict)
+                data_2022.append(company_dict)
 
 df_no_data = pd.DataFrame.from_records(no_data)
 df_no_data.to_csv("list_of_no_data_companies.csv", index=False, header=True)
