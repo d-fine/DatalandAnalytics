@@ -17,3 +17,4 @@ with dataland_datasets.ApiClient(configuration) as api_client:
 			uploader_data_sets.append(data_set)
 
 	uploader_data_sets.sort(key=lambda x: x.upload_time, reverse=True)
+print(uploader_data_sets)
