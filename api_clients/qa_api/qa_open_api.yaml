@@ -12,6 +12,37 @@ tags:
     url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
 paths:
   /datasets/{dataId}:
+    get:
+      tags:
+      - qa-controller
+      summary: Gets the QA review status of an uploaded dataset for a given id.
+      description: Get the QA review status of uploaded dataset for a given id.Users
+        can get the review status of their own datasets.Admins and reviewer can get
+        the review status for all datasets.
+      operationId: getDatasetById
+      parameters:
+      - name: dataId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Found a QA review status corresponding the id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewInformationResponse'
+        '404':
+          description: Found no QA review status corresponding the id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewInformationResponse'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
     post:
       tags:
       - qa-controller
@@ -29,6 +60,11 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/QaStatus'
+      - name: message
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully assigned quality status to dataset.
@@ -150,6 +186,24 @@ components:
       - Pending
       - Accepted
       - Rejected
+    ReviewInformationResponse:
+      required:
+      - dataId
+      - qaStatus
+      - receptionTime
+      type: object
+      properties:
+        dataId:
+          type: string
+        receptionTime:
+          type: integer
+          format: int64
+        qaStatus:
+          $ref: '#/components/schemas/QaStatus'
+        reviewerKeycloakId:
+          type: string
+        message:
+          type: string
     Link:
       type: object
       properties:
