@@ -1305,7 +1305,7 @@ paths:
   /data/{dataId}:
     delete:
       tags:
-      - admin-data-manipulation-controller
+      - data-deletion-controller
       summary: Delete a data set.
       description: The data is removed from the data store.
       operationId: deleteCompanyAssociatedData
@@ -1337,6 +1337,13 @@ components:
           type: array
           items:
             type: string
+        companyContactDetails:
+          type: array
+          example:
+          - Test@test.com
+          items:
+            type: string
+            example: '["Test@test.com"]'
         companyLegalForm:
           type: string
         headquarters:
@@ -1344,6 +1351,8 @@ components:
         headquartersPostalCode:
           type: string
         sector:
+          type: string
+        sectorCodeWz:
           type: string
         identifiers:
           type: object
@@ -4668,113 +4677,157 @@ components:
     Activity:
       type: string
       enum:
+      - AcquisitionAndOwnershipOfBuildings
       - Afforestation
-      - RehabilitationAndRestorationOfForestsIncludingReforestationAndNaturalForestRegenerationAfterAnExtremeEvent
-      - ForestManagement
-      - ConservationForestry
-      - RestorationOfWetlands
-      - ManufactureOfRenewableEnergyTechnologies
-      - ManufactureOfEquipmentForTheProductionAndUseOfHydrogen
-      - ManufactureOfLowCarbonTechnologiesForTransport
-      - ManufactureOfBatteries
-      - ManufactureOfEnergyEfficiencyEquipmentForBuildings
-      - ManufactureOfOtherLowCarbonTechnologies
-      - ManufactureOfCement
-      - ManufactureOfAluminium
-      - ManufactureOfIronAndSteel
-      - ManufactureOfHydrogen
-      - ManufactureOfCarbonBlack
-      - ManufactureOfSodaAsh
-      - ManufactureOfChlorine
-      - ManufactureOfOrganicBasicChemicals
-      - ManufactureOfAnhydrousAmmonia
-      - ManufactureOfNitricAcid
-      - ManufactureOfPlasticsInPrimaryForm
-      - ElectricityGenerationUsingSolarPhotovoltaicTechnology
-      - ElectricityGenerationUsingConcentratedSolarPowerCspTechnology
-      - ElectricityGenerationFromWindPower
-      - ElectricityGenerationFromOceanEnergyTechnologies
-      - ElectricityGenerationFromHydropower
-      - ElectricityGenerationFromGeothermalEnergy
-      - ElectricityGenerationFromRenewableNonFossilGaseousAndLiquidFuels
-      - ElectricityGenerationFromBioenergy
-      - TransmissionAndDistributionOfElectricity
-      - StorageOfElectricity
-      - StorageOfThermalEnergy
-      - StorageOfHydrogen
-      - ManufactureOfBiogasAndBiofuelsForUseInTransportAndOfBioliquids
-      - TransmissionAndDistributionNetworksForRenewableAndLowCarbonGases
-      - DistrictHeatingCoolingDistribution
-      - InstallationAndOperationOfElectricHeatPumps
-      - CogenerationOfHeatCoolAndPowerFromSolarEnergy
+      - AirTransportGroundHandlingOperations
+      - AirportInfrastructure
+      - AnaerobicDigestionOfBioWaste
+      - AnaerobicDigestionOfSewageSludge
+      - CloseToMarketResearchDevelopmentAndInnovation
+      - CogenerationOfHeatCoolAndPowerFromBioenergy
       - CogenerationOfHeatCoolAndPowerFromGeothermalEnergy
       - CogenerationOfHeatCoolAndPowerFromRenewableNonFossilGaseousAndLiquidFuels
-      - CogenerationOfHeatCoolAndPowerFromBioenergy
-      - ProductionOfHeatCoolFromSolarThermalHeating
-      - ProductionOfHeatCoolFromGeothermalEnergy
-      - ProductionOfHeatCoolFromRenewableNonFossilGaseousAndLiquidFuels
-      - ProductionOfHeatCoolFromBioenergy
-      - ProductionOfHeatCoolUsingWasteHeat
-      - PreCommercialStagesOfAdvancedTechnologiesToProduceEnergyFromNuclearProcessesWithMinimalWasteFromTheFuelCycle
-      - ConstructionAndSafeOperationOfNewNuclearPowerPlantsForTheGenerationOfElectricityAndOrHeatIncludingForHydrogenProductionUsingBestAvailableTechnologies
-      - ElectricityGenerationFromNuclearEnergyInExistingInstallations
-      - ElectricityGenerationFromFossilGaseousFuels
-      - HighEfficiencyCoGenerationOfHeatCoolAndPowerFromFossilGaseousFuels
-      - ProductionOfHeatCoolFromFossilGaseousFuelsInAnEfficientDistrictHeatingAndCoolingSystem
-      - ConstructionExtensionAndOperationOfWaterCollectionTreatmentAndSupplySystems
-      - RenewalOfWaterCollectionTreatmentAndSupplySystems
-      - ConstructionExtensionAndOperationOfWasteWaterCollectionAndTreatment
-      - RenewalOfWasteWaterCollectionAndTreatment
+      - CogenerationOfHeatCoolAndPowerFromSolarEnergy
+      - CollectionAndTransportOfHazardousWaste
+      - CollectionAndTransportOfNonHazardousAndHazardousWaste
       - CollectionAndTransportOfNonHazardousWasteInSourceSegregatedFractions
-      - AnaerobicDigestionOfSewageSludge
-      - AnaerobicDigestionOfBioWaste
       - CompostingOfBioWaste
-      - MaterialRecoveryFromNonHazardousWaste
-      - LandfillGasCaptureAndUtilisation
-      - TransportOfCo2
-      - UndergroundPermanentGeologicalStorageOfCo2
-      - PassengerInterurbanRailTransport
+      - ComputerProgrammingConsultancyAndRelatedActivities
+      - ConservationForestry
+      - ConservationIncludingRestorationOfHabitatsEcosystemsAndSpecies
+      - ConstructionAndSafeOperationOfNewNuclearPowerPlantsForTheGenerationOfElectricityAndOrHeatIncludingForHydrogenProductionUsingBestAvailableTechnologies
+      - ConstructionExtensionAndOperationOfWasteWaterCollectionAndTreatment
+      - ConstructionExtensionAndOperationOfWaterCollectionTreatmentAndSupplySystems
+      - ConstructionOfNewBuildings
+      - ConsultancyForPhysicalClimateRiskManagementAndAdaptation
+      - CreativeArtsAndEntertainmentActivities
+      - DataDrivenSolutionsForGhgEmissionsReductions
+      - DataProcessingHostingAndRelatedActivities
+      - DemolitionAndWreckingOfBuildingsAndOtherStructures
+      - DepollutionAndDismantlingOfEndOfLifeProducts
+      - Desalination
+      - DistrictHeatingCoolingDistribution
+      - Education
+      - ElectricityGenerationFromBioenergy
+      - ElectricityGenerationFromFossilGaseousFuels
+      - ElectricityGenerationFromGeothermalEnergy
+      - ElectricityGenerationFromHydropower
+      - ElectricityGenerationFromNuclearEnergyInExistingInstallations
+      - ElectricityGenerationFromOceanEnergyTechnologies
+      - ElectricityGenerationFromRenewableNonFossilGaseousAndLiquidFuels
+      - ElectricityGenerationFromWindPower
+      - ElectricityGenerationUsingConcentratedSolarPowerCspTechnology
+      - ElectricityGenerationUsingSolarPhotovoltaicTechnology
+      - EmergencyServices
+      - EngineeringActivitiesAndRelatedTechnicalConsultancyDedicatedToAdaptationToClimateChange
+      - FloodRiskPreventionAndProtectionInfrastructure
+      - ForestManagement
       - FreightRailTransport
-      - UrbanAndSuburbanTransportRoadPassengerTransport
-      - OperationOfPersonalMobilityDevicesCycleLogistics
-      - TransportByMotorbikesPassengerCarsAndLightCommercialVehicles
       - FreightTransportServicesByRoad
-      - InlandPassengerWaterTransport
-      - InlandFreightWaterTransport
-      - RetrofittingOfInlandWaterPassengerAndFreightTransport
-      - SeaAndCoastalFreightWaterTransportVesselsForPortOperationsAndAuxiliaryActivities
-      - SeaAndCoastalPassengerWaterTransport
-      - RetrofittingOfSeaAndCoastalFreightAndPassengerWaterTransport
-      - InfrastructureForPersonalMobilityCycleLogistics
-      - InfrastructureForRailTransport
+      - HighEfficiencyCoGenerationOfHeatCoolAndPowerFromFossilGaseousFuels
+      - HotelsHolidayCampingGroundsAndSimilarAccommodation
       - InfrastructureEnablingLowCarbonRoadTransportAndPublicTransport
       - InfrastructureEnablingLowCarbonWaterTransport
-      - LowCarbonAirportInfrastructure
-      - ConstructionOfNewBuildings
-      - RenovationOfExistingBuildings
-      - InstallationMaintenanceAndRepairOfEnergyEfficiencyEquipment
+      - InfrastructureEnablingRoadTransportAndPublicTransport
+      - InfrastructureForPersonalMobilityCycleLogistics
+      - InfrastructureForRailTransport
+      - InfrastructureForWaterTransport
+      - InlandFreightWaterTransport
+      - InlandPassengerWaterTransport
+      - InstallationAndOperationOfElectricHeatPumps
       - InstallationMaintenanceAndRepairOfChargingStationsForElectricVehiclesInBuildingsAndParkingSpacesAttachedToBuildings
+      - InstallationMaintenanceAndRepairOfEnergyEfficiencyEquipment
       - InstallationMaintenanceAndRepairOfInstrumentsAndDevicesForMeasuringRegulationAndControllingEnergyPerformanceOfBuildings
       - InstallationMaintenanceAndRepairOfRenewableEnergyTechnologies
-      - AcquisitionAndOwnershipOfBuildings
-      - DataProcessingHostingAndRelatedActivities
-      - DataDrivenSolutionsForGhgEmissionsReductions
-      - CloseToMarketResearchDevelopmentAndInnovation
-      - ResearchDevelopmentAndInnovationForDirectAirCaptureOfCo2
-      - ProfessionalServicesRelatedToEnergyPerformanceOfBuildings
-      - InfrastructureEnablingRoadTransportAndPublicTransport
-      - InfrastructureForWaterTransport
-      - AirportInfrastructure
-      - ComputerProgrammingConsultancyAndRelatedActivities
-      - ProgrammingAndBroadcastingActivities
-      - EngineeringActivitiesAndRelatedTechnicalConsultancyDedicatedToAdaptationToClimateChange
-      - NonLifeInsuranceUnderwritingOfClimateRelatedPerils
-      - Reinsurance
-      - Education
-      - ResidentialCareActivities
-      - CreativeArtsAndEntertainmentActivities
+      - LandfillGasCaptureAndUtilisation
+      - LeasingOfAircraft
       - LibrariesArchivesMuseumsAndCulturalActivities
+      - LowCarbonAirportInfrastructure
+      - MaintenanceOfRoadsAndMotorways
+      - ManufactureInstallationAndAssociatedServicesForLeakageControlTechnologiesEnablingLeakageReductionAndPreventionInWaterSupplySystems
+      - ManufactureInstallationAndServicingOfHighMediumAndLowVoltageElectricalEquipmentForElectricalTransmissionAndDistributionThatResultInOrEnableASubstantialContributionToClimateChangeMitigation
+      - ManufactureOfActivePharmaceuticalIngredientsApiOrActiveSubstances
+      - ManufactureOfAluminium
+      - ManufactureOfAnhydrousAmmonia
+      - ManufactureOfAutomotiveAndMobilityComponents
+      - ManufactureOfBatteries
+      - ManufactureOfBiogasAndBiofuelsForUseInTransportAndOfBioliquids
+      - ManufactureOfCarbonBlack
+      - ManufactureOfCement
+      - ManufactureOfChlorine
+      - ManufactureOfElectricalAndElectronicEquipment
+      - ManufactureOfEnergyEfficiencyEquipmentForBuildings
+      - ManufactureOfEquipmentForTheProductionAndUseOfHydrogen
+      - ManufactureOfHydrogen
+      - ManufactureOfIronAndSteel
+      - ManufactureOfLowCarbonTechnologiesForTransport
+      - ManufactureOfMedicinalProducts
+      - ManufactureOfNitricAcid
+      - ManufactureOfOrganicBasicChemicals
+      - ManufactureOfOtherLowCarbonTechnologies
+      - ManufactureOfPlasticPackagingGoods
+      - ManufactureOfPlasticsInPrimaryForm
+      - ManufactureOfRailRollingStockConstituents
+      - ManufactureOfRenewableEnergyTechnologies
+      - ManufactureOfSodaAsh
+      - ManufacturingOfAircraft
+      - MarketplaceForTheTradeOfSecondHandGoodsForReuse
+      - MaterialRecoveryFromNonHazardousWaste
       - MotionPictureVideoAndTelevisionProgrammeProductionSoundRecordingAndMusicPublishingActivities
+      - NatureBasedSolutionsForFloodAndDroughtRiskPreventionAndProtection
+      - NonLifeInsuranceUnderwritingOfClimateRelatedPerils
+      - OperationOfPersonalMobilityDevicesCycleLogistics
+      - PassengerAndFreightAirTransport
+      - PassengerInterurbanRailTransport
+      - PhosphorusRecoveryFromWasteWater
+      - PreCommercialStagesOfAdvancedTechnologiesToProduceEnergyFromNuclearProcessesWithMinimalWasteFromTheFuelCycle
+      - PreparationForReUseOfEndOfLifeProductsAndProductComponents
+      - ProductAsAServiceAndOtherCircularUseAndResultOrientedServiceModels
+      - ProductionOfAlternativeWaterResourcesForPurposesOtherThanHumanConsumption
+      - ProductionOfHeatCoolFromBioenergy
+      - ProductionOfHeatCoolFromFossilGaseousFuelsInAnEfficientDistrictHeatingAndCoolingSystem
+      - ProductionOfHeatCoolFromGeothermalEnergy
+      - ProductionOfHeatCoolFromRenewableNonFossilGaseousAndLiquidFuels
+      - ProductionOfHeatCoolFromSolarThermalHeating
+      - ProductionOfHeatCoolUsingWasteHeat
+      - ProfessionalServicesRelatedToEnergyPerformanceOfBuildings
+      - ProgrammingAndBroadcastingActivities
+      - ProvisionOfItOtDataDrivenSolutions
+      - ProvisionOfItOtDataDrivenSolutionsForLeakageReduction
+      - RecoveryOfBioWasteByAnaerobicDigestionOrComposting
+      - RehabilitationAndRestorationOfForestsIncludingReforestationAndNaturalForestRegenerationAfterAnExtremeEvent
+      - Reinsurance
+      - RemediationOfContaminatedSitesAndAreas
+      - RemediationOfLegallyNonConformingLandfillsAndAbandonedOrIllegalWasteDumps
+      - RenewalOfWasteWaterCollectionAndTreatment
+      - RenewalOfWaterCollectionTreatmentAndSupplySystems
+      - RenovationOfExistingBuildings
+      - RepairRefurbishmentAndRemanufacturing
+      - ResearchDevelopmentAndInnovationForDirectAirCaptureOfCo2
+      - ResidentialCareActivities
+      - RestorationOfWetlands
+      - RetrofittingOfInlandWaterPassengerAndFreightTransport
+      - RetrofittingOfSeaAndCoastalFreightAndPassengerWaterTransport
+      - SaleOfSecondHandGoods
+      - SaleOfSpareParts
+      - SeaAndCoastalFreightWaterTransportVesselsForPortOperationsAndAuxiliaryActivities
+      - SeaAndCoastalPassengerWaterTransport
+      - SoftwareEnablingPhysicalClimateRiskManagementAndAdaptation
+      - SortingAndMaterialRecoveryOfNonHazardousWaste
+      - StorageOfElectricity
+      - StorageOfHydrogen
+      - StorageOfThermalEnergy
+      - SustainableUrbanDrainageSystemsSuds
+      - TransmissionAndDistributionNetworksForRenewableAndLowCarbonGases
+      - TransmissionAndDistributionOfElectricity
+      - TransportByMotorbikesPassengerCarsAndLightCommercialVehicles
+      - TransportOfCo2
+      - TreatmentOfHazardousWaste
+      - UndergroundPermanentGeologicalStorageOfCo2
+      - UrbanAndSuburbanTransportRoadPassengerTransport
+      - UrbanWasteWaterTreatment
+      - UseOfConcreteInCivilEngineering
+      - WaterSupply
     AssuranceDataPoint:
       required:
       - value
@@ -6355,6 +6408,10 @@ components:
           type: array
           items:
             type: string
+        companyContactDetails:
+          type: array
+          items:
+            type: string
         companyLegalForm:
           type: string
         headquarters:
@@ -6362,6 +6419,8 @@ components:
         headquartersPostalCode:
           type: string
         sector:
+          type: string
+        sectorCodeWz:
           type: string
         identifiers:
           type: object
@@ -6512,13 +6571,13 @@ components:
       properties:
         lei:
           type: string
+        sector:
+          type: string
         companyName:
           type: string
         headquarters:
           type: string
         countryCode:
-          type: string
-        sector:
           type: string
         companyId:
           type: string
