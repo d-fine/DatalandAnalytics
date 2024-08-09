@@ -59,6 +59,158 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
+  /company-role-assignments/{role}/{companyId}/{userId}:
+    post:
+      tags:
+      - company-roles-controller
+      summary: Assign company role for the company to the user.
+      description: The company role for the specified company is being assigned to
+        the user. Endpoint accessible for all Dataland-Admins and some Company-Role-Assignees
+        of the company, based on the company role that shall be assigned.
+      operationId: assignCompanyRole
+      parameters:
+      - name: role
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CompanyRole'
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successfully assigned company role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyRoleAssignment'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+    delete:
+      tags:
+      - company-roles-controller
+      summary: Remove company role for the company from the user.
+      description: The company role for the specified company is being removed from
+        the user. Endpoint accessible for all Dataland-Admins and some Company-Role-Assignees
+        of the company, based on the company role that shall be removed.
+      operationId: removeCompanyRole
+      parameters:
+      - name: role
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CompanyRole'
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successfully removed company role.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+    head:
+      tags:
+      - company-roles-controller
+      summary: Validate company role for company and user.
+      description: Checks whether the company role for the company is assigned to
+        the user. Endpoint accessible for all Dataland-Admins, for all users that
+        check for their own userId, and all Company-Role-Assignees of the company.
+      operationId: hasUserCompanyRole
+      parameters:
+      - name: role
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CompanyRole'
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '404':
+          description: Either the specified company does not exist on Dataland or
+            the user does not have the company role for it.
+        '200':
+          description: The specified user has the company role.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /company-ownership/{companyId}:
+    post:
+      tags:
+      - company-roles-controller
+      summary: Request company ownership for the company.
+      description: Request company ownership for the company on Dataland. Endpoint
+        accessible for all Dataland users.
+      operationId: postCompanyOwnershipRequest
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: comment
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully requested company ownership.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+    head:
+      tags:
+      - company-roles-controller
+      summary: Validate existence of company ownership for the company.
+      description: Validates if at least one company owner exists for the specified
+        company. Endpoint accessible for all Dataland users.
+      operationId: hasCompanyAtLeastOneOwner
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '404':
+          description: The specified company has no company owner(s) yet
+        '200':
+          description: The specified company has company owner(s).
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
   /requests/{dataRequestId}/requestStatus:
     patch:
       tags:
@@ -121,7 +273,7 @@ paths:
           - lksg
           - p2p
           - sfdr
-          - sme
+          - vsme
           - esg-questionnaire
           - heimathafen
       - name: userId
@@ -229,7 +381,7 @@ paths:
             - lksg
             - p2p
             - sfdr
-            - sme
+            - vsme
             - esg-questionnaire
             - heimathafen
       - name: reportingPeriod
@@ -251,6 +403,53 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AggregatedDataRequest'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /company-role-assignments:
+    get:
+      tags:
+      - company-roles-controller
+      summary: Retrieve company role assignments for company and company role.
+      description: Get company role assignments for the specified company role and
+        company. Endpoint accessible for all Dataland-Admins and all Company-Role-Assignees
+        of the company.
+      operationId: getCompanyRoleAssignments
+      parameters:
+      - name: role
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompanyRole'
+      - name: companyId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '404':
+          description: The specified company does not exist on Dataland.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompanyRoleAssignment'
+        '200':
+          description: Successfully retrieved company role assignments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompanyRoleAssignment'
       security:
       - default-oauth: []
       - default-bearer-auth: []
@@ -363,7 +562,7 @@ components:
           - lksg
           - p2p
           - sfdr
-          - sme
+          - vsme
           - esg-questionnaire
           - heimathafen
         reportingPeriods:
@@ -419,7 +618,7 @@ components:
           type: array
           example:
           - p2p
-          - sme
+          - vsme
           items:
             type: string
             enum:
@@ -428,7 +627,7 @@ components:
             - lksg
             - p2p
             - sfdr
-            - sme
+            - vsme
             - esg-questionnaire
             - heimathafen
         reportingPeriods:
@@ -456,6 +655,26 @@ components:
           type: array
           items:
             type: string
+    CompanyRole:
+      type: string
+      enum:
+      - CompanyOwner
+      - DataUploader
+      - MemberAdmin
+      - Member
+    CompanyRoleAssignment:
+      required:
+      - companyId
+      - companyRole
+      - userId
+      type: object
+      properties:
+        companyRole:
+          $ref: '#/components/schemas/CompanyRole'
+        companyId:
+          type: string
+        userId:
+          type: string
     RequestStatus:
       type: string
       enum:
@@ -468,6 +687,7 @@ components:
       required:
       - creationTimestamp
       - dataRequestId
+      - dataRequestStatusHistory
       - dataType
       - datalandCompanyId
       - lastModifiedDate
@@ -494,6 +714,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StoredDataRequestMessageObject'
+        dataRequestStatusHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoredDataRequestStatusObject'
         lastModifiedDate:
           type: integer
           format: int64
@@ -515,6 +739,17 @@ components:
         creationTimestamp:
           type: integer
           format: int64
+    StoredDataRequestStatusObject:
+      required:
+      - creationTimestamp
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RequestStatus'
+        creationTimestamp:
+          type: integer
+          format: int64
     ExtendedStoredDataRequest:
       required:
       - companyName
@@ -523,7 +758,6 @@ components:
       - dataType
       - datalandCompanyId
       - lastModifiedDate
-      - messageHistory
       - reportingPeriod
       - requestStatus
       - userId
@@ -544,10 +778,6 @@ components:
           type: string
         companyName:
           type: string
-        messageHistory:
-          type: array
-          items:
-            $ref: '#/components/schemas/StoredDataRequestMessageObject'
         lastModifiedDate:
           type: integer
           format: int64
@@ -568,7 +798,7 @@ components:
           - lksg
           - p2p
           - sfdr
-          - sme
+          - vsme
           - esg-questionnaire
           - heimathafen
         reportingPeriod:
