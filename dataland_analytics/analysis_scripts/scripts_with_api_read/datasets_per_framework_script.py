@@ -11,9 +11,17 @@ configuration = dataland_datasets.Configuration(
 	access_token = PERSONAL_USER_API_KEY
 )
 
-frameworks = ['sme', 'sfdr', 'p2p', 'lksg', 'heimathafen', 'eutaxonomy-non-financials', 'esg-questionnaire',
-			  'eutaxonomy-financials']
-reporting_periods = ['2020','2021','2022','2023','2024']
+frameworks = [
+    "sme",
+    "sfdr",
+    "p2p",
+    "lksg",
+    "heimathafen",
+    "eutaxonomy-non-financials",
+    "esg-questionnaire",
+    "eutaxonomy-financials",
+]
+reporting_periods = ["2020", "2021", "2022", "2023", "2024"]
 result = pd.DataFrame(columns=frameworks, index=reporting_periods)
 
 with dataland_datasets.ApiClient(configuration) as api_client:
