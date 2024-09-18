@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
-declare -a apis=("datasets" "documents" "requests" "qa")
+declare -a apis=("datasets" "documents" "community" "qa")
 
 for api in "${apis[@]}"
 do

@@ -63,6 +63,26 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
+    head:
+      tags:
+      - company-data-controller
+      summary: Checks if a company exists for the specified companyId.
+      description: Checks if a company exists for the specified companyId.
+      operationId: isCompanyIdValid
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully checked that the companyId is known by dataland.
+        '404':
+          description: Check was successfull. CompanyId is not known by dataland.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
     patch:
       tags:
       - company-data-controller
@@ -308,6 +328,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CompanyAssociatedDataEsgQuestionnaireData'
+        required: true
+      responses:
+        '200':
+          description: Successfully added data to the data store.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataMetaInformation'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /data/additional-company-information:
+    post:
+      tags:
+      - additional-company-information-data-controller
+      operationId: postCompanyAssociatedAdditionalCompanyInformationData
+      parameters:
+      - name: bypassQa
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyAssociatedDataAdditionalCompanyInformationData'
         required: true
       responses:
         '200':
@@ -1045,6 +1093,61 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
+  /data/additional-company-information/{dataId}:
+    get:
+      tags:
+      - additional-company-information-data-controller
+      operationId: getCompanyAssociatedAdditionalCompanyInformationData
+      parameters:
+      - name: dataId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved data set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyAssociatedDataAdditionalCompanyInformationData'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
+  /data/additional-company-information/companies/{companyId}:
+    get:
+      tags:
+      - additional-company-information-data-controller
+      operationId: getAllCompanyAdditionalCompanyInformationData
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: showOnlyActive
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: reportingPeriod
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved framework datasets with meta info.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataAndMetaInformationAdditionalCompanyInformationData'
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
   /companies/{companyId}/info:
     get:
       tags:
@@ -1231,14 +1334,14 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
@@ -1258,10 +1361,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health:
@@ -1277,10 +1380,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health/**:
@@ -1296,16 +1399,16 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /data/{dataId}:
     delete:
       tags:
-      - admin-data-manipulation-controller
+      - data-deletion-controller
       summary: Delete a data set.
       description: The data is removed from the data store.
       operationId: deleteCompanyAssociatedData
@@ -1337,6 +1440,13 @@ components:
           type: array
           items:
             type: string
+        companyContactDetails:
+          type: array
+          example:
+          - Test@test.com
+          items:
+            type: string
+            example: '["Test@test.com"]'
         companyLegalForm:
           type: string
         headquarters:
@@ -1344,6 +1454,8 @@ components:
         headquartersPostalCode:
           type: string
         sector:
+          type: string
+        sectorCodeWz:
           type: string
         identifiers:
           type: object
@@ -1503,8 +1615,7 @@ components:
       type: object
       properties:
         page:
-          type: integer
-          format: int64
+          type: string
         tagName:
           type: string
         fileName:
@@ -1518,6 +1629,7 @@ components:
       - Reported
       - Estimated
       - Incomplete
+      - NoDataFound
     ReleaseMedium:
       type: string
       enum:
@@ -1937,11 +2049,11 @@ components:
           type: string
         dataSource:
           $ref: '#/components/schemas/ExtendedDocumentReference'
-    ExtendedDataPointYesNoNoEvidenceFound:
+    ExtendedDataPointYesNo:
       type: object
       properties:
         value:
-          $ref: '#/components/schemas/YesNoNoEvidenceFound'
+          $ref: '#/components/schemas/YesNo'
         quality:
           $ref: '#/components/schemas/QualityOptions'
         comment:
@@ -1978,27 +2090,27 @@ components:
       type: object
       properties:
         primaryForestAndWoodedLandOfNativeSpeciesExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         protectedAreasExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         rareOrEndangeredEcosystemsExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         highlyBiodiverseGrasslandExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         manufactureOfAgrochemicalPesticidesProducts:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         landDegradationDesertificationSoilSealingExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         sustainableAgriculturePolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         sustainableOceansAndSeasPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         threatenedSpeciesExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         biodiversityProtectionPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         deforestationPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
     SfdrEnvironmentalEmissions:
       type: object
       properties:
@@ -2009,7 +2121,7 @@ components:
         emissionsOfOzoneDepletionSubstancesInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         carbonReductionInitiatives:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
     SfdrEnvironmentalEnergyPerformance:
       type: object
       properties:
@@ -2236,6 +2348,10 @@ components:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         scope3GhgEmissionsInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope3UpstreamGhgEmissionsInTonnes:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        scope3DownstreamGhgEmissionsInTonnes:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         scope1And2And3GhgEmissionsInTonnes:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         scope1And2And3GhgEmissionsLocationBasedInTonnes:
@@ -2250,8 +2366,16 @@ components:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         ghgIntensityInTonnesPerMillionEURRevenue:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        ghgIntensityScope1InTonnesPerMillionEURRevenue:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        ghgIntensityScope2InTonnesPerMillionEURRevenue:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        ghgIntensityScope3InTonnesPerMillionEURRevenue:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        ghgIntensityScope4InTonnesPerMillionEURRevenue:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         fossilFuelSectorExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
     SfdrEnvironmentalWaste:
       type: object
       properties:
@@ -2271,9 +2395,9 @@ components:
         relativeWaterUsageInCubicMetersPerMillionEURRevenue:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         waterManagementPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         highWaterStressAreaExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
     SfdrGeneral:
       required:
       - general
@@ -2510,85 +2634,91 @@ components:
       type: object
       properties:
         securitiesNotCertifiedAsGreen:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
     SfdrSocialHumanRights:
       type: object
       properties:
         humanRightsPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         humanRightsDueDiligence:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         traffickingInHumanBeingsPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         reportedChildLabourIncidents:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         reportedForcedOrCompulsoryLabourIncidents:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         numberOfReportedIncidentsOfHumanRightsViolations:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
     SfdrSocialSocialAndEmployeeMatters:
       type: object
       properties:
         humanRightsLegalProceedings:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         iloCoreLabourStandards:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         environmentalPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         corruptionLegalProceedings:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         transparencyDisclosurePolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         humanRightsDueDiligencePolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         policyAgainstChildLabour:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         policyAgainstForcedLabour:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         policyAgainstDiscriminationInTheWorkplace:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         iso14001Certificate:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         policyAgainstBriberyAndCorruption:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         fairBusinessMarketingAdvertisingPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         technologiesExpertiseTransferPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         fairCompetitionPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         violationOfTaxRulesAndRegulation:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         unGlobalCompactPrinciplesCompliancePolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         oecdGuidelinesForMultinationalEnterprisesGrievanceHandling:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         averageGrossHourlyEarningsMaleEmployees:
           $ref: '#/components/schemas/CurrencyDataPoint'
         averageGrossHourlyEarningsFemaleEmployees:
           $ref: '#/components/schemas/CurrencyDataPoint'
         unadjustedGenderPayGapInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-        femaleBoardMembers:
+        femaleBoardMembersSupervisoryBoard:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
-        maleBoardMembers:
+        femaleBoardMembersBoardOfDirectors:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
-        boardGenderDiversityInPercent:
+        maleBoardMembersSupervisoryBoard:
+          $ref: '#/components/schemas/ExtendedDataPointBigInteger'
+        maleBoardMembersBoardOfDirectors:
+          $ref: '#/components/schemas/ExtendedDataPointBigInteger'
+        boardGenderDiversitySupervisoryBoardInPercent:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        boardGenderDiversityBoardOfDirectorsInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         controversialWeaponsExposure:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         workplaceAccidentPreventionPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         rateOfAccidentsInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         workdaysLostInDays:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         supplierCodeOfConduct:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         grievanceHandlingMechanism:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         whistleblowerProtectionPolicy:
-          $ref: '#/components/schemas/ExtendedDataPointYesNoNoEvidenceFound'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         reportedIncidentsOfDiscrimination:
           $ref: '#/components/schemas/ExtendedDataPointBigInteger'
         sanctionedIncidentsOfDiscrimination:
@@ -2597,12 +2727,6 @@ components:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         excessiveCeoPayRatioInPercent:
           $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
-    YesNoNoEvidenceFound:
-      type: string
-      enum:
-      - 'Yes'
-      - 'No'
-      - NoEvidenceFound
     CompanyAssociatedDataPathwaysToParisData:
       required:
       - companyId
@@ -4668,113 +4792,157 @@ components:
     Activity:
       type: string
       enum:
+      - AcquisitionAndOwnershipOfBuildings
       - Afforestation
-      - RehabilitationAndRestorationOfForestsIncludingReforestationAndNaturalForestRegenerationAfterAnExtremeEvent
-      - ForestManagement
-      - ConservationForestry
-      - RestorationOfWetlands
-      - ManufactureOfRenewableEnergyTechnologies
-      - ManufactureOfEquipmentForTheProductionAndUseOfHydrogen
-      - ManufactureOfLowCarbonTechnologiesForTransport
-      - ManufactureOfBatteries
-      - ManufactureOfEnergyEfficiencyEquipmentForBuildings
-      - ManufactureOfOtherLowCarbonTechnologies
-      - ManufactureOfCement
-      - ManufactureOfAluminium
-      - ManufactureOfIronAndSteel
-      - ManufactureOfHydrogen
-      - ManufactureOfCarbonBlack
-      - ManufactureOfSodaAsh
-      - ManufactureOfChlorine
-      - ManufactureOfOrganicBasicChemicals
-      - ManufactureOfAnhydrousAmmonia
-      - ManufactureOfNitricAcid
-      - ManufactureOfPlasticsInPrimaryForm
-      - ElectricityGenerationUsingSolarPhotovoltaicTechnology
-      - ElectricityGenerationUsingConcentratedSolarPowerCspTechnology
-      - ElectricityGenerationFromWindPower
-      - ElectricityGenerationFromOceanEnergyTechnologies
-      - ElectricityGenerationFromHydropower
-      - ElectricityGenerationFromGeothermalEnergy
-      - ElectricityGenerationFromRenewableNonFossilGaseousAndLiquidFuels
-      - ElectricityGenerationFromBioenergy
-      - TransmissionAndDistributionOfElectricity
-      - StorageOfElectricity
-      - StorageOfThermalEnergy
-      - StorageOfHydrogen
-      - ManufactureOfBiogasAndBiofuelsForUseInTransportAndOfBioliquids
-      - TransmissionAndDistributionNetworksForRenewableAndLowCarbonGases
-      - DistrictHeatingCoolingDistribution
-      - InstallationAndOperationOfElectricHeatPumps
-      - CogenerationOfHeatCoolAndPowerFromSolarEnergy
+      - AirTransportGroundHandlingOperations
+      - AirportInfrastructure
+      - AnaerobicDigestionOfBioWaste
+      - AnaerobicDigestionOfSewageSludge
+      - CloseToMarketResearchDevelopmentAndInnovation
+      - CogenerationOfHeatCoolAndPowerFromBioenergy
       - CogenerationOfHeatCoolAndPowerFromGeothermalEnergy
       - CogenerationOfHeatCoolAndPowerFromRenewableNonFossilGaseousAndLiquidFuels
-      - CogenerationOfHeatCoolAndPowerFromBioenergy
-      - ProductionOfHeatCoolFromSolarThermalHeating
-      - ProductionOfHeatCoolFromGeothermalEnergy
-      - ProductionOfHeatCoolFromRenewableNonFossilGaseousAndLiquidFuels
-      - ProductionOfHeatCoolFromBioenergy
-      - ProductionOfHeatCoolUsingWasteHeat
-      - PreCommercialStagesOfAdvancedTechnologiesToProduceEnergyFromNuclearProcessesWithMinimalWasteFromTheFuelCycle
-      - ConstructionAndSafeOperationOfNewNuclearPowerPlantsForTheGenerationOfElectricityAndOrHeatIncludingForHydrogenProductionUsingBestAvailableTechnologies
-      - ElectricityGenerationFromNuclearEnergyInExistingInstallations
-      - ElectricityGenerationFromFossilGaseousFuels
-      - HighEfficiencyCoGenerationOfHeatCoolAndPowerFromFossilGaseousFuels
-      - ProductionOfHeatCoolFromFossilGaseousFuelsInAnEfficientDistrictHeatingAndCoolingSystem
-      - ConstructionExtensionAndOperationOfWaterCollectionTreatmentAndSupplySystems
-      - RenewalOfWaterCollectionTreatmentAndSupplySystems
-      - ConstructionExtensionAndOperationOfWasteWaterCollectionAndTreatment
-      - RenewalOfWasteWaterCollectionAndTreatment
+      - CogenerationOfHeatCoolAndPowerFromSolarEnergy
+      - CollectionAndTransportOfHazardousWaste
+      - CollectionAndTransportOfNonHazardousAndHazardousWaste
       - CollectionAndTransportOfNonHazardousWasteInSourceSegregatedFractions
-      - AnaerobicDigestionOfSewageSludge
-      - AnaerobicDigestionOfBioWaste
       - CompostingOfBioWaste
-      - MaterialRecoveryFromNonHazardousWaste
-      - LandfillGasCaptureAndUtilisation
-      - TransportOfCo2
-      - UndergroundPermanentGeologicalStorageOfCo2
-      - PassengerInterurbanRailTransport
+      - ComputerProgrammingConsultancyAndRelatedActivities
+      - ConservationForestry
+      - ConservationIncludingRestorationOfHabitatsEcosystemsAndSpecies
+      - ConstructionAndSafeOperationOfNewNuclearPowerPlantsForTheGenerationOfElectricityAndOrHeatIncludingForHydrogenProductionUsingBestAvailableTechnologies
+      - ConstructionExtensionAndOperationOfWasteWaterCollectionAndTreatment
+      - ConstructionExtensionAndOperationOfWaterCollectionTreatmentAndSupplySystems
+      - ConstructionOfNewBuildings
+      - ConsultancyForPhysicalClimateRiskManagementAndAdaptation
+      - CreativeArtsAndEntertainmentActivities
+      - DataDrivenSolutionsForGhgEmissionsReductions
+      - DataProcessingHostingAndRelatedActivities
+      - DemolitionAndWreckingOfBuildingsAndOtherStructures
+      - DepollutionAndDismantlingOfEndOfLifeProducts
+      - Desalination
+      - DistrictHeatingCoolingDistribution
+      - Education
+      - ElectricityGenerationFromBioenergy
+      - ElectricityGenerationFromFossilGaseousFuels
+      - ElectricityGenerationFromGeothermalEnergy
+      - ElectricityGenerationFromHydropower
+      - ElectricityGenerationFromNuclearEnergyInExistingInstallations
+      - ElectricityGenerationFromOceanEnergyTechnologies
+      - ElectricityGenerationFromRenewableNonFossilGaseousAndLiquidFuels
+      - ElectricityGenerationFromWindPower
+      - ElectricityGenerationUsingConcentratedSolarPowerCspTechnology
+      - ElectricityGenerationUsingSolarPhotovoltaicTechnology
+      - EmergencyServices
+      - EngineeringActivitiesAndRelatedTechnicalConsultancyDedicatedToAdaptationToClimateChange
+      - FloodRiskPreventionAndProtectionInfrastructure
+      - ForestManagement
       - FreightRailTransport
-      - UrbanAndSuburbanTransportRoadPassengerTransport
-      - OperationOfPersonalMobilityDevicesCycleLogistics
-      - TransportByMotorbikesPassengerCarsAndLightCommercialVehicles
       - FreightTransportServicesByRoad
-      - InlandPassengerWaterTransport
-      - InlandFreightWaterTransport
-      - RetrofittingOfInlandWaterPassengerAndFreightTransport
-      - SeaAndCoastalFreightWaterTransportVesselsForPortOperationsAndAuxiliaryActivities
-      - SeaAndCoastalPassengerWaterTransport
-      - RetrofittingOfSeaAndCoastalFreightAndPassengerWaterTransport
-      - InfrastructureForPersonalMobilityCycleLogistics
-      - InfrastructureForRailTransport
+      - HighEfficiencyCoGenerationOfHeatCoolAndPowerFromFossilGaseousFuels
+      - HotelsHolidayCampingGroundsAndSimilarAccommodation
       - InfrastructureEnablingLowCarbonRoadTransportAndPublicTransport
       - InfrastructureEnablingLowCarbonWaterTransport
-      - LowCarbonAirportInfrastructure
-      - ConstructionOfNewBuildings
-      - RenovationOfExistingBuildings
-      - InstallationMaintenanceAndRepairOfEnergyEfficiencyEquipment
+      - InfrastructureEnablingRoadTransportAndPublicTransport
+      - InfrastructureForPersonalMobilityCycleLogistics
+      - InfrastructureForRailTransport
+      - InfrastructureForWaterTransport
+      - InlandFreightWaterTransport
+      - InlandPassengerWaterTransport
+      - InstallationAndOperationOfElectricHeatPumps
       - InstallationMaintenanceAndRepairOfChargingStationsForElectricVehiclesInBuildingsAndParkingSpacesAttachedToBuildings
+      - InstallationMaintenanceAndRepairOfEnergyEfficiencyEquipment
       - InstallationMaintenanceAndRepairOfInstrumentsAndDevicesForMeasuringRegulationAndControllingEnergyPerformanceOfBuildings
       - InstallationMaintenanceAndRepairOfRenewableEnergyTechnologies
-      - AcquisitionAndOwnershipOfBuildings
-      - DataProcessingHostingAndRelatedActivities
-      - DataDrivenSolutionsForGhgEmissionsReductions
-      - CloseToMarketResearchDevelopmentAndInnovation
-      - ResearchDevelopmentAndInnovationForDirectAirCaptureOfCo2
-      - ProfessionalServicesRelatedToEnergyPerformanceOfBuildings
-      - InfrastructureEnablingRoadTransportAndPublicTransport
-      - InfrastructureForWaterTransport
-      - AirportInfrastructure
-      - ComputerProgrammingConsultancyAndRelatedActivities
-      - ProgrammingAndBroadcastingActivities
-      - EngineeringActivitiesAndRelatedTechnicalConsultancyDedicatedToAdaptationToClimateChange
-      - NonLifeInsuranceUnderwritingOfClimateRelatedPerils
-      - Reinsurance
-      - Education
-      - ResidentialCareActivities
-      - CreativeArtsAndEntertainmentActivities
+      - LandfillGasCaptureAndUtilisation
+      - LeasingOfAircraft
       - LibrariesArchivesMuseumsAndCulturalActivities
+      - LowCarbonAirportInfrastructure
+      - MaintenanceOfRoadsAndMotorways
+      - ManufactureInstallationAndAssociatedServicesForLeakageControlTechnologiesEnablingLeakageReductionAndPreventionInWaterSupplySystems
+      - ManufactureInstallationAndServicingOfHighMediumAndLowVoltageElectricalEquipmentForElectricalTransmissionAndDistributionThatResultInOrEnableASubstantialContributionToClimateChangeMitigation
+      - ManufactureOfActivePharmaceuticalIngredientsApiOrActiveSubstances
+      - ManufactureOfAluminium
+      - ManufactureOfAnhydrousAmmonia
+      - ManufactureOfAutomotiveAndMobilityComponents
+      - ManufactureOfBatteries
+      - ManufactureOfBiogasAndBiofuelsForUseInTransportAndOfBioliquids
+      - ManufactureOfCarbonBlack
+      - ManufactureOfCement
+      - ManufactureOfChlorine
+      - ManufactureOfElectricalAndElectronicEquipment
+      - ManufactureOfEnergyEfficiencyEquipmentForBuildings
+      - ManufactureOfEquipmentForTheProductionAndUseOfHydrogen
+      - ManufactureOfHydrogen
+      - ManufactureOfIronAndSteel
+      - ManufactureOfLowCarbonTechnologiesForTransport
+      - ManufactureOfMedicinalProducts
+      - ManufactureOfNitricAcid
+      - ManufactureOfOrganicBasicChemicals
+      - ManufactureOfOtherLowCarbonTechnologies
+      - ManufactureOfPlasticPackagingGoods
+      - ManufactureOfPlasticsInPrimaryForm
+      - ManufactureOfRailRollingStockConstituents
+      - ManufactureOfRenewableEnergyTechnologies
+      - ManufactureOfSodaAsh
+      - ManufacturingOfAircraft
+      - MarketplaceForTheTradeOfSecondHandGoodsForReuse
+      - MaterialRecoveryFromNonHazardousWaste
       - MotionPictureVideoAndTelevisionProgrammeProductionSoundRecordingAndMusicPublishingActivities
+      - NatureBasedSolutionsForFloodAndDroughtRiskPreventionAndProtection
+      - NonLifeInsuranceUnderwritingOfClimateRelatedPerils
+      - OperationOfPersonalMobilityDevicesCycleLogistics
+      - PassengerAndFreightAirTransport
+      - PassengerInterurbanRailTransport
+      - PhosphorusRecoveryFromWasteWater
+      - PreCommercialStagesOfAdvancedTechnologiesToProduceEnergyFromNuclearProcessesWithMinimalWasteFromTheFuelCycle
+      - PreparationForReUseOfEndOfLifeProductsAndProductComponents
+      - ProductAsAServiceAndOtherCircularUseAndResultOrientedServiceModels
+      - ProductionOfAlternativeWaterResourcesForPurposesOtherThanHumanConsumption
+      - ProductionOfHeatCoolFromBioenergy
+      - ProductionOfHeatCoolFromFossilGaseousFuelsInAnEfficientDistrictHeatingAndCoolingSystem
+      - ProductionOfHeatCoolFromGeothermalEnergy
+      - ProductionOfHeatCoolFromRenewableNonFossilGaseousAndLiquidFuels
+      - ProductionOfHeatCoolFromSolarThermalHeating
+      - ProductionOfHeatCoolUsingWasteHeat
+      - ProfessionalServicesRelatedToEnergyPerformanceOfBuildings
+      - ProgrammingAndBroadcastingActivities
+      - ProvisionOfItOtDataDrivenSolutions
+      - ProvisionOfItOtDataDrivenSolutionsForLeakageReduction
+      - RecoveryOfBioWasteByAnaerobicDigestionOrComposting
+      - RehabilitationAndRestorationOfForestsIncludingReforestationAndNaturalForestRegenerationAfterAnExtremeEvent
+      - Reinsurance
+      - RemediationOfContaminatedSitesAndAreas
+      - RemediationOfLegallyNonConformingLandfillsAndAbandonedOrIllegalWasteDumps
+      - RenewalOfWasteWaterCollectionAndTreatment
+      - RenewalOfWaterCollectionTreatmentAndSupplySystems
+      - RenovationOfExistingBuildings
+      - RepairRefurbishmentAndRemanufacturing
+      - ResearchDevelopmentAndInnovationForDirectAirCaptureOfCo2
+      - ResidentialCareActivities
+      - RestorationOfWetlands
+      - RetrofittingOfInlandWaterPassengerAndFreightTransport
+      - RetrofittingOfSeaAndCoastalFreightAndPassengerWaterTransport
+      - SaleOfSecondHandGoods
+      - SaleOfSpareParts
+      - SeaAndCoastalFreightWaterTransportVesselsForPortOperationsAndAuxiliaryActivities
+      - SeaAndCoastalPassengerWaterTransport
+      - SoftwareEnablingPhysicalClimateRiskManagementAndAdaptation
+      - SortingAndMaterialRecoveryOfNonHazardousWaste
+      - StorageOfElectricity
+      - StorageOfHydrogen
+      - StorageOfThermalEnergy
+      - SustainableUrbanDrainageSystemsSuds
+      - TransmissionAndDistributionNetworksForRenewableAndLowCarbonGases
+      - TransmissionAndDistributionOfElectricity
+      - TransportByMotorbikesPassengerCarsAndLightCommercialVehicles
+      - TransportOfCo2
+      - TreatmentOfHazardousWaste
+      - UndergroundPermanentGeologicalStorageOfCo2
+      - UrbanAndSuburbanTransportRoadPassengerTransport
+      - UrbanWasteWaterTreatment
+      - UseOfConcreteInCivilEngineering
+      - WaterSupply
     AssuranceDataPoint:
       required:
       - value
@@ -4855,6 +5023,10 @@ components:
           $ref: '#/components/schemas/YesNo'
         minimumSafeguards:
           $ref: '#/components/schemas/YesNo'
+        enablingActivity:
+          $ref: '#/components/schemas/YesNo'
+        transitionalActivity:
+          $ref: '#/components/schemas/YesNo'
     EutaxonomyNonFinancialsCapex:
       type: object
       properties:
@@ -4867,59 +5039,93 @@ components:
         nonAlignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsCapexNonAlignedShare'
         nonAlignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyActivity'
         alignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsCapexAlignedShare'
-        substantialContributionToClimateChangeMitigationInPercent:
-          type: number
-        substantialContributionToClimateChangeAdaptationInPercent:
-          type: number
-        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercent:
-          type: number
-        substantialContributionToTransitionToACircularEconomyInPercent:
-          type: number
-        substantialContributionToPollutionPreventionAndControlInPercent:
-          type: number
-        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercent:
-          type: number
+        substantialContributionToClimateChangeMitigationInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentTransitionalShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         alignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyAlignedActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyAlignedActivity'
         enablingShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         transitionalShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
     EutaxonomyNonFinancialsCapexAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsCapexEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsCapexNonAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsCapexNonEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsData:
       type: object
       properties:
@@ -4935,20 +5141,19 @@ components:
       type: object
       properties:
         fiscalYearDeviation:
-          $ref: '#/components/schemas/EutaxonomyNonFinancialsGeneralFiscalYearDeviationOptions'
+          $ref: '#/components/schemas/ExtendedDataPointEutaxonomyNonFinancialsGeneralFiscalYearDeviationOptions'
         fiscalYearEnd:
-          type: string
-          format: date
+          $ref: '#/components/schemas/ExtendedDataPointLocalDate'
         scopeOfEntities:
-          $ref: '#/components/schemas/YesNoNa'
+          $ref: '#/components/schemas/ExtendedDataPointYesNoNa'
         nfrdMandatory:
-          $ref: '#/components/schemas/YesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         euTaxonomyActivityLevelReporting:
-          $ref: '#/components/schemas/YesNo'
+          $ref: '#/components/schemas/ExtendedDataPointYesNo'
         assurance:
           $ref: '#/components/schemas/AssuranceDataPoint'
         numberOfEmployees:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         referencedReports:
           type: object
           additionalProperties:
@@ -4972,59 +5177,55 @@ components:
         nonAlignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsOpexNonAlignedShare'
         nonAlignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyActivity'
         alignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsOpexAlignedShare'
-        substantialContributionToClimateChangeMitigationInPercent:
-          type: number
-        substantialContributionToClimateChangeAdaptationInPercent:
-          type: number
-        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercent:
-          type: number
-        substantialContributionToTransitionToACircularEconomyInPercent:
-          type: number
-        substantialContributionToPollutionPreventionAndControlInPercent:
-          type: number
-        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercent:
-          type: number
+        substantialContributionToClimateChangeMitigationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         alignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyAlignedActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyAlignedActivity'
         enablingShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         transitionalShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
     EutaxonomyNonFinancialsOpexAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsOpexEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsOpexNonAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsOpexNonEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsRevenue:
       type: object
       properties:
@@ -5037,59 +5238,153 @@ components:
         nonAlignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsRevenueNonAlignedShare'
         nonAlignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyActivity'
         alignedShare:
           $ref: '#/components/schemas/EutaxonomyNonFinancialsRevenueAlignedShare'
-        substantialContributionToClimateChangeMitigationInPercent:
-          type: number
-        substantialContributionToClimateChangeAdaptationInPercent:
-          type: number
-        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercent:
-          type: number
-        substantialContributionToTransitionToACircularEconomyInPercent:
-          type: number
-        substantialContributionToPollutionPreventionAndControlInPercent:
-          type: number
-        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercent:
-          type: number
+        substantialContributionToClimateChangeMitigationInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeMitigationInPercentTransitionalShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToClimateChangeAdaptationInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToSustainableUseAndProtectionOfWaterAndMarineResourcesInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToTransitionToACircularEconomyInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToPollutionPreventionAndControlInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentEligible:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentAligned:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentOfWhichUseOfProceeds:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
+        substantialContributionToProtectionAndRestorationOfBiodiversityAndEcosystemsInPercentEnablingShare:
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         alignedActivities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EuTaxonomyAlignedActivity'
+          $ref: '#/components/schemas/ExtendedDataPointListEuTaxonomyAlignedActivity'
         enablingShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         transitionalShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
     EutaxonomyNonFinancialsRevenueAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsRevenueEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsRevenueNonAlignedShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
     EutaxonomyNonFinancialsRevenueNonEligibleShare:
       type: object
       properties:
         relativeShareInPercent:
-          type: number
+          $ref: '#/components/schemas/ExtendedDataPointBigDecimal'
         absoluteShare:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          $ref: '#/components/schemas/CurrencyDataPoint'
+    ExtendedDataPointEutaxonomyNonFinancialsGeneralFiscalYearDeviationOptions:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/EutaxonomyNonFinancialsGeneralFiscalYearDeviationOptions'
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
+    ExtendedDataPointListEuTaxonomyActivity:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/EuTaxonomyActivity'
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
+    ExtendedDataPointListEuTaxonomyAlignedActivity:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/EuTaxonomyAlignedActivity'
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
+    ExtendedDataPointLocalDate:
+      type: object
+      properties:
+        value:
+          type: string
+          format: date
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
+    ExtendedDataPointYesNoNa:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/YesNoNa'
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
     RelativeAndAbsoluteFinancialShare:
       type: object
       properties:
@@ -6346,12 +6641,81 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/UnfallrateValues'
+    AdditionalCompanyInformationData:
+      type: object
+      properties:
+        general:
+          $ref: '#/components/schemas/AdditionalCompanyInformationGeneral'
+    AdditionalCompanyInformationGeneral:
+      type: object
+      properties:
+        general:
+          $ref: '#/components/schemas/AdditionalCompanyInformationGeneralGeneral'
+        financialInformation:
+          $ref: '#/components/schemas/AdditionalCompanyInformationGeneralFinancialInformation'
+    AdditionalCompanyInformationGeneralFinancialInformation:
+      type: object
+      properties:
+        equity:
+          $ref: '#/components/schemas/CurrencyDataPoint'
+        debt:
+          $ref: '#/components/schemas/CurrencyDataPoint'
+        balanceSheetTotal:
+          $ref: '#/components/schemas/CurrencyDataPoint'
+        evic:
+          $ref: '#/components/schemas/CurrencyDataPoint'
+    AdditionalCompanyInformationGeneralGeneral:
+      type: object
+      properties:
+        fiscalYearDeviation:
+          $ref: '#/components/schemas/ExtendedDataPointAdditionalCompanyInformationGeneralGeneralFiscalYearDeviationOptions'
+        fiscalYearEnd:
+          $ref: '#/components/schemas/ExtendedDataPointLocalDate'
+        referencedReports:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CompanyReport'
+          example: '{"string": {"fileReference": "string","fileName": "string","publicationDate":
+            "2023-10-12",}}'
+    AdditionalCompanyInformationGeneralGeneralFiscalYearDeviationOptions:
+      type: string
+      enum:
+      - Deviation
+      - NoDeviation
+    CompanyAssociatedDataAdditionalCompanyInformationData:
+      required:
+      - companyId
+      - data
+      - reportingPeriod
+      type: object
+      properties:
+        companyId:
+          type: string
+        reportingPeriod:
+          type: string
+        data:
+          $ref: '#/components/schemas/AdditionalCompanyInformationData'
+    ExtendedDataPointAdditionalCompanyInformationGeneralGeneralFiscalYearDeviationOptions:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/AdditionalCompanyInformationGeneralGeneralFiscalYearDeviationOptions'
+        quality:
+          $ref: '#/components/schemas/QualityOptions'
+        comment:
+          type: string
+        dataSource:
+          $ref: '#/components/schemas/ExtendedDocumentReference'
     CompanyInformationPatch:
       type: object
       properties:
         companyName:
           type: string
         companyAlternativeNames:
+          type: array
+          items:
+            type: string
+        companyContactDetails:
           type: array
           items:
             type: string
@@ -6362,6 +6726,8 @@ components:
         headquartersPostalCode:
           type: string
         sector:
+          type: string
+        sectorCodeWz:
           type: string
         identifiers:
           type: object
@@ -6502,6 +6868,16 @@ components:
           $ref: '#/components/schemas/DataMetaInformation'
         data:
           $ref: '#/components/schemas/EsgQuestionnaireData'
+    DataAndMetaInformationAdditionalCompanyInformationData:
+      required:
+      - data
+      - metaInfo
+      type: object
+      properties:
+        metaInfo:
+          $ref: '#/components/schemas/DataMetaInformation'
+        data:
+          $ref: '#/components/schemas/AdditionalCompanyInformationData'
     BasicCompanyInformation:
       required:
       - companyId
@@ -6518,9 +6894,9 @@ components:
           type: string
         countryCode:
           type: string
-        sector:
-          type: string
         companyId:
+          type: string
+        sector:
           type: string
     AggregatedFrameworkDataSummary:
       required:
@@ -6581,6 +6957,7 @@ components:
       - vsme
       - esg-questionnaire
       - heimathafen
+      - additional-company-information
   securitySchemes:
     default-bearer-auth:
       type: http

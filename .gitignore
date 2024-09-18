@@ -1,7 +1,7 @@
 # Generated code for API clients
-api_clients/requests_api/*
-api_clients/requests_api/*/
-!/api_clients/requests_api/requests_open_api.yaml
+api_clients/community_api/*
+api_clients/community_api/*/
+!/api_clients/community_api/community_open_api.yaml
 api_clients/datasets_api/*
 api_clients/datasets_api/*/
 !/api_clients/datasets_api/datasets_open_api.yaml
