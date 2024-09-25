@@ -581,6 +581,20 @@ paths:
         required: false
         schema:
           type: string
+      - name: uploaderUserIds
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: qaStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/QaStatus'
       responses:
         '200':
           description: Successfully retrieved meta info.
@@ -6894,9 +6908,9 @@ components:
           type: string
         countryCode:
           type: string
-        companyId:
-          type: string
         sector:
+          type: string
+        companyId:
           type: string
     AggregatedFrameworkDataSummary:
       required:
