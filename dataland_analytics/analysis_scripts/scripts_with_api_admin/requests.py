@@ -6,11 +6,12 @@ from datetime import datetime
 import dataland_community
 import pandas as pd
 from dataland_community import RequestStatus
-from dataland_datasets import DataMetaInformation, StoredCompany
+from dataland_datasets import StoredCompany
+from dataland_qa import ReviewQueueResponse
 
 from api_clients.community_api.dataland_community.models.extended_stored_data_request import ExtendedStoredDataRequest
 from dataland_analytics.config import *
-from datasets import get_pending_datasets, get_metadata_for_dataset, get_company_data_by_company_id
+from datasets_utils import get_pending_datasets, get_company_data_by_company_id
 from export_nonfinancial_dataset_to_excel import adjust_excel_column_widths
 from formatting_utils import get_readable_datatype_string_from_input, get_enum_value, timestamp_in_ms_to_datetime
 
@@ -37,35 +38,16 @@ def search_requests(criteria: dict) -> list[ExtendedStoredDataRequest]:
     return [req for req in requests_by_criteria]
 
 
-def get_pending_datasets_for_requests(requests: list[ExtendedStoredDataRequest]) -> list[DataMetaInformation]:
+def get_pending_datasets_for_requests(requests: list[ExtendedStoredDataRequest]) -> list[ReviewQueueResponse]:
     """
     This function filters out from the list of pending datasets all those which match a request of the input
     :param requests: requests to find the pending datasets for
     :return: list of matching datasets
     """
-    pending_dataset_ids = get_pending_datasets()
-    pending_datasets_metadata = get_metadata_for_dataset(*pending_dataset_ids)
+    pending_datasets: list[ReviewQueueResponse] = get_pending_datasets()
 
     matching_datasets = []
-    for dataset_metadata in pending_datasets_metadata:
-        for req in requests:
-            if is_match(dataset_metadata, req):
-                matching_datasets.append(dataset_metadata)
-
-    return matching_datasets
-
-
-def find_pending_datasets_for_requests(requests: list[ExtendedStoredDataRequest]) -> list[DataMetaInformation]:
-    """
-    This function filters out from the list of pending datasets all those which match a request of the input
-    :param requests: requests to find the pending datasets for
-    :return: list of matching datasets
-    """
-    pending_dataset_ids = get_pending_datasets()
-    pending_datasets_metadata = get_metadata_for_dataset(*pending_dataset_ids)
-
-    matching_datasets = []
-    for dataset_metadata in pending_datasets_metadata:
+    for dataset_metadata in pending_datasets:
         for req in requests:
             if is_match(dataset_metadata, req):
                 matching_datasets.append(dataset_metadata)
@@ -84,14 +66,14 @@ def filter_requests_updated_later_than_threshold(requests: list[ExtendedStoredDa
     return list(filter(lambda req: timestamp_in_ms_to_datetime(req.last_modified_date) > timestamp, requests))
 
 
-def is_match(data: DataMetaInformation, req: ExtendedStoredDataRequest) -> bool:
+def is_match(data: ReviewQueueResponse, req: ExtendedStoredDataRequest) -> bool:
     """
     Returns true if dataset matches the request
     :param data: dataset
     :param req: request
     :return: bool
     """
-    return (data.data_type == req.data_type and data.reporting_period == req.reporting_period
+    return (data.framework == req.data_type and data.reporting_period == req.reporting_period
             and data.company_id == req.dataland_company_id)
 
 
@@ -134,19 +116,25 @@ if __name__ == "__main__":
     # DEFINE FILTER PARAMETERS
     search_parameters = {
         "data_type": ["eutaxonomy-financials", "eutaxonomy-non-financials"],
-        "email_address": "enter_substring_here",
+        "email_address": "",
         "chunk_size": 500,
         "chunk_index": 0,
     }
 
     # GET REQUESTS AND MATCHING PENDING DATASETS
-    requests_for_search: list[ExtendedStoredDataRequest] = search_requests(search_parameters)
-    matching_pending_datasets: list[DataMetaInformation] = get_pending_datasets_for_requests(requests_for_search)
+    requests_for_search: list[ExtendedStoredDataRequest] = []
+    for address in ["Sandra.Piehl@nordlb.de", "Karoline.Kuehne@nordlb.de", "Stefan.Leise@nordlb.de", "homberger"]:
+        param = search_parameters
+        param["email_address"] = address
+
+        requests_for_search.extend(search_requests(param))
+
+    matching_pending_datasets: list[ReviewQueueResponse] = get_pending_datasets_for_requests(requests_for_search)
     answered_requests_for_search: list[ExtendedStoredDataRequest] = \
         list(filter(lambda req: getattr(req, 'request_status') == RequestStatus.ANSWERED, requests_for_search))
     newest_answered_requests_for_search: list[ExtendedStoredDataRequest] = \
         filter_requests_updated_later_than_threshold(answered_requests_for_search,
-                                                     datetime.strptime("2024-09-17", '%Y-%m-%d'))
+                                                     datetime.strptime("2024-09-19 11:57:00", '%Y-%m-%d %H:%M:%S'))
 
     # GET DATASET_IDS FOR ANSWERED REQUESTS
     dataset_ids_for_answered_requests = []

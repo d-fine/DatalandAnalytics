@@ -1,13 +1,9 @@
 import dataland_community
-import dataland_datasets
-import dataland_qa
 import numpy as np
 import openpyxl
-import pandas as pd
 from openpyxl.styles import Alignment
 
-from dataland_analytics.config import *
-from datasets import create_link_to_dataset, get_metadata_for_dataset
+from datasets_utils import *
 
 """
 Export all provided datasets to excel sheets
@@ -26,80 +22,8 @@ qa_api_configuration = dataland_qa.Configuration(
 )
 
 
-def update_entries(entry):
-    """
-    Effectively: if entry is of enum type, return entry.value, else keep entry as is
-    :param entry:
-    :return:
-    """
-    return entry.value if entry is not None and hasattr(entry, 'value') and entry.value else entry
-
-
-def sanitize_dataframe(dataframe: pd.DataFrame, str_pattern='') -> pd.DataFrame:
-    """
-    Sanitizes dataframe, i.e. delete irrelevant and empty columns, columns containing empty lists, and replace enum type
-    entries with their corresponding value
-    :param dataframe:
-    :param str_pattern:
-    :return:
-    """
-    # deletes columns with name matching pattern
-    sanitized = dataframe.loc[:, ~dataframe.columns.str.contains(str_pattern)]
-    # deletes columns with empty rows
-    sanitized.dropna(axis=1, how='all')
-    # deletes columns with entry '[]' (empty list)
-    sanitized = sanitized.loc[:, ~sanitized.apply(lambda rows: (all(isinstance(entry, list)
-                                                                    and len(entry) == 0 for entry in rows)))]
-    sanitized = sanitized.map(update_entries)
-    return sanitized
-
-
-def merge_connected_value_currency_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
-    """
-    Merge value-currency pairs of columns. Only works for prettified column headers
-    :param dataframe:
-    :return:
-    """
-    for col in dataframe.columns:
-        if col.endswith('value'):
-            currency_col_name = col.replace('value', 'currency')
-
-            if currency_col_name in dataframe.columns:
-                dataframe[col.replace('value', '')] = dataframe[col].astype(str) + ' ' + dataframe[currency_col_name]
-                dataframe.drop(columns=[currency_col_name, col], inplace=True)
-    return dataframe
-
-
-def merge_connected_amount_currency_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
-    """
-    Merge value-currency pairs of columns. Only works for prettified column headers
-    :param dataframe:
-    :return:
-    """
-    for col in dataframe.columns:
-        if col.endswith('amount'):
-            currency_col_name = col.replace('amount', 'currency')
-
-            if currency_col_name in dataframe.columns:
-                dataframe[col] = dataframe[col].astype(str) + ' ' + dataframe[currency_col_name]
-                dataframe.drop(columns=[currency_col_name], inplace=True)
-    return dataframe
-
-
-def prettify_header_strings(input_string):
-    """
-    prettify the column header strings
-    :param input_string:
-    :return:
-    """
-    parts = input_string.split('.')
-    titled_parts = []
-    for part in parts:
-        if part != 'value':
-            spaced_part = ''.join([char if char.islower() else ' ' + char for char in part])
-            titled_parts.append(spaced_part.title())
-
-    return ' '.join(titled_parts)
+def create_link_to_dataset(datameta: DataMetaInformation) -> str:
+    return DATALAND_SERVER + f"companies/{datameta.company_id}/frameworks/{datameta.data_type.value}/{datameta.data_id}"
 
 
 def adjust_excel_column_widths(path):
@@ -187,7 +111,7 @@ with (dataland_datasets.ApiClient(dataset_api_configuration) as dataset_api_clie
             share_dataframe = pd.json_normalize(activity_dataframe['share'])
             activity_dataframe = pd.concat([activity_dataframe.drop(columns='share'), share_dataframe], axis=1)
             merge_connected_amount_currency_columns(activity_dataframe)
-            activity_dataframe = activity_dataframe.map(update_entries)
+            activity_dataframe = activity_dataframe.map(replace_enum_entries_with_value)
             activity_dataframe.columns = [prettify_header_strings(col) for col in activity_dataframe.columns]
 
             with pd.ExcelWriter(path=file_name, engine="openpyxl", datetime_format='YYYY-MM-DD HH:MM:SS',
