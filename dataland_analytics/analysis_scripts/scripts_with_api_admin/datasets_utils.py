@@ -58,7 +58,7 @@ def sanitize_dataframe(dataframe: pd.DataFrame, str_pattern='') -> pd.DataFrame:
     # deletes columns with name matching pattern
     sanitized = dataframe.loc[:, ~dataframe.columns.str.contains(str_pattern)]
     # deletes columns with empty rows
-    sanitized.dropna(axis=1, how='all')
+    sanitized = sanitized.dropna(axis=1, how='all')
     # deletes columns with entry '[]' (empty list)
     sanitized = sanitized.loc[:, ~sanitized.apply(lambda rows: (all(isinstance(entry, list)
                                                                     and len(entry) == 0 for entry in rows)))]

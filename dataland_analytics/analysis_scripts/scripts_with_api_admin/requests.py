@@ -106,7 +106,7 @@ def export_requests_to_excel(requests: list[dict], path: str, exclude_columns=No
         with pd.ExcelWriter(path=path, engine="openpyxl",
                             mode='w', datetime_format='YYYY-MM-DD HH:MM:SS') as excel_writer:
             requests_dataframe.to_excel(excel_writer, sheet_name="Overview")
-        adjust_excel_column_widths(file_name)
+        adjust_excel_column_widths(path)
         print("Export finished.")
     else:
         print("No requests matching the filters found")
@@ -123,22 +123,25 @@ if __name__ == "__main__":
 
     # GET REQUESTS AND MATCHING PENDING DATASETS
     requests_for_search: list[ExtendedStoredDataRequest] = []
-    for address in ["Sandra.Piehl@nordlb.de", "Karoline.Kuehne@nordlb.de", "Stefan.Leise@nordlb.de", "homberger"]:
+    for address in ["dummy@value.com"]:
         param = search_parameters
         param["email_address"] = address
 
         requests_for_search.extend(search_requests(param))
 
     matching_pending_datasets: list[ReviewQueueResponse] = get_pending_datasets_for_requests(requests_for_search)
-    answered_requests_for_search: list[ExtendedStoredDataRequest] = \
-        list(filter(lambda req: getattr(req, 'request_status') == RequestStatus.ANSWERED, requests_for_search))
-    newest_answered_requests_for_search: list[ExtendedStoredDataRequest] = \
-        filter_requests_updated_later_than_threshold(answered_requests_for_search,
+    answered_or_resolved_requests_for_search: list[ExtendedStoredDataRequest] = \
+        list(filter(lambda req: getattr(req, 'request_status') == RequestStatus.ANSWERED
+                                or getattr(req, 'request_status') == RequestStatus.RESOLVED, requests_for_search))
+    open_requests_for_search: list[ExtendedStoredDataRequest] = \
+        list(filter(lambda req: getattr(req, 'request_status') == RequestStatus.OPEN, requests_for_search))
+    newest_answered_or_resolved_requests_for_search: list[ExtendedStoredDataRequest] = \
+        filter_requests_updated_later_than_threshold(answered_or_resolved_requests_for_search,
                                                      datetime.strptime("2024-09-19 11:57:00", '%Y-%m-%d %H:%M:%S'))
 
     # GET DATASET_IDS FOR ANSWERED REQUESTS
     dataset_ids_for_answered_requests = []
-    for request in answered_requests_for_search:
+    for request in answered_or_resolved_requests_for_search:
         company_id = request.dataland_company_id
         company_data: StoredCompany = get_company_data_by_company_id(company_id)[0]
         for dataset in company_data.data_registered_by_dataland:
@@ -147,6 +150,7 @@ if __name__ == "__main__":
                 dataset_ids_for_answered_requests.append(dataset.data_id)
 
     # PREPARE REQUESTS FOR OUTPUT
+    dataset_ids_for_answered_requests = set(dataset_ids_for_answered_requests)
     formatted_requests = []
 
     for request in requests_for_search:
@@ -157,9 +161,11 @@ if __name__ == "__main__":
 
     print(f"Total number of requests: {len(requests_for_search)}")
     print(f"Total number of matching pending datasets: {len(matching_pending_datasets)}")
-    print(f"Total number of answered requests: {len(answered_requests_for_search)}")
-    print(f"Number of newest answered requests: {len(newest_answered_requests_for_search)}")
-    print(f"Dataset Ids for answered requests {[dataset_id for dataset_id in dataset_ids_for_answered_requests]}")
+    print(f"Total number of answered/resolved requests: {len(answered_or_resolved_requests_for_search)}")
+    print(f"Total number of open requests: {len(open_requests_for_search)}")
+    print(f"Number of newest answered/resolved requests: {len(newest_answered_or_resolved_requests_for_search)}")
+    print(f"All {len(dataset_ids_for_answered_requests)} Dataset Ids for answered/resolved requests\n{[dataset_id for dataset_id in dataset_ids_for_answered_requests]}")
+    print(f"All {len(dataset_ids_for_answered_requests)} Dataset Ids for answered/resolved requests\n{[dataset_id for dataset_id in dataset_ids_for_answered_requests]}")
 
     # EXPORT
     file_name = f"./NordLB_Data_Requests_Overview_{datetime.today().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
