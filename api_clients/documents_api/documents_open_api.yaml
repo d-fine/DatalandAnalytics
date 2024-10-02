@@ -78,11 +78,11 @@ paths:
               schema:
                 type: string
                 format: binary
-            application/vnd.ms-excel:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            application/vnd.ms-excel:
               schema:
                 type: string
                 format: binary
@@ -131,14 +131,14 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
@@ -158,10 +158,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health:
@@ -177,10 +177,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health/**:
@@ -196,10 +196,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
 components:

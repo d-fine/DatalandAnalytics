@@ -65,7 +65,7 @@ paths:
       - company-roles-controller
       summary: Assign company role for the company to the user.
       description: The company role for the specified company is being assigned to
-        the user. Endpoint accessible for all Dataland-Admins and some Company-Role-Assignees
+        the user. Endpoint accessible to all Dataland-Admins and some Company-Role-Assignees
         of the company, based on the company role that shall be assigned.
       operationId: assignCompanyRole
       parameters:
@@ -101,7 +101,7 @@ paths:
       - company-roles-controller
       summary: Remove company role for the company from the user.
       description: The company role for the specified company is being removed from
-        the user. Endpoint accessible for all Dataland-Admins and some Company-Role-Assignees
+        the user. Endpoint accessible to all Dataland-Admins and some Company-Role-Assignees
         of the company, based on the company role that shall be removed.
       operationId: removeCompanyRole
       parameters:
@@ -133,8 +133,8 @@ paths:
       - company-roles-controller
       summary: Validate company role for company and user.
       description: Checks whether the company role for the company is assigned to
-        the user. Endpoint accessible for all Dataland-Admins, for all users that
-        check for their own userId, and all Company-Role-Assignees of the company.
+        the user. Endpoint accessible to all Dataland-Admins, for all users that check
+        for their own userId, and all Company-Role-Assignees of the company.
       operationId: hasUserCompanyRole
       parameters:
       - name: role
@@ -169,7 +169,7 @@ paths:
       - company-roles-controller
       summary: Request company ownership for the company.
       description: Request company ownership for the company on Dataland. Endpoint
-        accessible for all Dataland users.
+        accessible to all Dataland users.
       operationId: postCompanyOwnershipRequest
       parameters:
       - name: companyId
@@ -194,7 +194,7 @@ paths:
       - company-roles-controller
       summary: Validate existence of company ownership for the company.
       description: Validates if at least one company owner exists for the specified
-        company. Endpoint accessible for all Dataland users.
+        company. Endpoint accessible to all Dataland users.
       operationId: hasCompanyAtLeastOneOwner
       parameters:
       - name: companyId
@@ -231,6 +231,11 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/RequestStatus'
+      - name: accessStatus
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccessStatus'
       - name: contacts
         in: query
         required: false
@@ -254,6 +259,46 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
+  /requests/dataset-access/{companyId}/{dataType}/{reportingPeriod}/{userId}:
+    head:
+      tags:
+      - request-controller
+      summary: This head request checks whether the logged-in user has access to dataset.
+      description: This head request checks whether the logged-in user has access
+        to dataset.
+      operationId: hasAccessToDataset
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: dataType
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: reportingPeriod
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The user can access the dataset.
+        '404':
+          description: Either the specified dataset does not exist or the user cannot
+            access the dataset.
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
   /requests:
     get:
       tags:
@@ -266,17 +311,26 @@ paths:
         in: query
         required: false
         schema:
-          type: string
-          enum:
-          - eutaxonomy-financials
-          - eutaxonomy-non-financials
-          - lksg
-          - p2p
-          - sfdr
-          - vsme
-          - esg-questionnaire
-          - heimathafen
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - eutaxonomy-financials
+            - eutaxonomy-non-financials
+            - lksg
+            - p2p
+            - sfdr
+            - vsme
+            - esg-questionnaire
+            - heimathafen
+            - additional-company-information
       - name: userId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: emailAddress
         in: query
         required: false
         schema:
@@ -285,7 +339,18 @@ paths:
         in: query
         required: false
         schema:
-          $ref: '#/components/schemas/RequestStatus'
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestStatus'
+      - name: accessStatus
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessStatus'
       - name: reportingPeriod
         in: query
         required: false
@@ -296,6 +361,20 @@ paths:
         required: false
         schema:
           type: string
+      - name: chunkSize
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      - name: chunkIndex
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
       responses:
         '200':
           description: Successfully retrieved data requests
@@ -304,7 +383,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StoredDataRequest'
+                  $ref: '#/components/schemas/ExtendedStoredDataRequest'
       security:
       - default-oauth: []
       - default-bearer-auth: []
@@ -353,6 +432,79 @@ paths:
       security:
       - default-oauth: []
       - default-bearer-auth: []
+  /requests/numberOfRequests:
+    get:
+      tags:
+      - request-controller
+      summary: Get the number of requests based on filters.
+      description: Get the number of requests based on filters.
+      operationId: getNumberOfRequests
+      parameters:
+      - name: dataType
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - eutaxonomy-financials
+            - eutaxonomy-non-financials
+            - lksg
+            - p2p
+            - sfdr
+            - vsme
+            - esg-questionnaire
+            - heimathafen
+            - additional-company-information
+      - name: userId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: emailAddress
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: requestStatus
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestStatus'
+      - name: accessStatus
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessStatus'
+      - name: reportingPeriod
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: datalandCompanyId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the number of data requests.
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+      security:
+      - default-oauth: []
+      - default-bearer-auth: []
   /requests/aggregated:
     get:
       tags:
@@ -384,6 +536,7 @@ paths:
             - vsme
             - esg-questionnaire
             - heimathafen
+            - additional-company-information
       - name: reportingPeriod
         in: query
         required: false
@@ -410,10 +563,11 @@ paths:
     get:
       tags:
       - company-roles-controller
-      summary: Retrieve company role assignments for company and company role.
-      description: Get company role assignments for the specified company role and
-        company. Endpoint accessible for all Dataland-Admins and all Company-Role-Assignees
-        of the company.
+      summary: Get company role assignments that match the provided filters.
+      description: Get company role assignments that match the provided filters. Endpoint
+        fully accessible to all Dataland-Admins. Company-Role-Assignees can access
+        the endpoint if companyId-filter is set to their company. Any Dataland-user
+        can access the endpoint if the userId-filter is set to their userId.
       operationId: getCompanyRoleAssignments
       parameters:
       - name: role
@@ -470,14 +624,14 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
                 additionalProperties:
                   type: object
                   additionalProperties:
                     $ref: '#/components/schemas/Link'
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
@@ -497,10 +651,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health:
@@ -516,10 +670,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health/**:
@@ -535,10 +689,10 @@ paths:
             application/vnd.spring-boot.actuator.v3+json:
               schema:
                 type: object
-            application/vnd.spring-boot.actuator.v2+json:
+            application/json:
               schema:
                 type: object
-            application/json:
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
 components:
@@ -565,6 +719,7 @@ components:
           - vsme
           - esg-questionnaire
           - heimathafen
+          - additional-company-information
         reportingPeriods:
           uniqueItems: true
           type: array
@@ -586,6 +741,7 @@ components:
       required:
       - message
       - reportingPeriodsOfDuplicateDataRequests
+      - reportingPeriodsOfStoredAccessRequests
       - reportingPeriodsOfStoredDataRequests
       type: object
       properties:
@@ -596,6 +752,10 @@ components:
           items:
             type: string
         reportingPeriodsOfDuplicateDataRequests:
+          type: array
+          items:
+            type: string
+        reportingPeriodsOfStoredAccessRequests:
           type: array
           items:
             type: string
@@ -630,6 +790,7 @@ components:
             - vsme
             - esg-questionnaire
             - heimathafen
+            - additional-company-information
         reportingPeriods:
           uniqueItems: true
           type: array
@@ -683,8 +844,17 @@ components:
       - Resolved
       - Withdrawn
       - Closed
+    AccessStatus:
+      type: string
+      enum:
+      - Declined
+      - Granted
+      - Pending
+      - Public
+      - Revoked
     StoredDataRequest:
       required:
+      - accessStatus
       - creationTimestamp
       - dataRequestId
       - dataRequestStatusHistory
@@ -700,6 +870,8 @@ components:
         dataRequestId:
           type: string
         userId:
+          type: string
+        userEmailAddress:
           type: string
         creationTimestamp:
           type: integer
@@ -723,6 +895,8 @@ components:
           format: int64
         requestStatus:
           $ref: '#/components/schemas/RequestStatus'
+        accessStatus:
+          $ref: '#/components/schemas/AccessStatus'
     StoredDataRequestMessageObject:
       required:
       - contacts
@@ -741,6 +915,7 @@ components:
           format: int64
     StoredDataRequestStatusObject:
       required:
+      - accessStatus
       - creationTimestamp
       - status
       type: object
@@ -750,8 +925,11 @@ components:
         creationTimestamp:
           type: integer
           format: int64
+        accessStatus:
+          $ref: '#/components/schemas/AccessStatus'
     ExtendedStoredDataRequest:
       required:
+      - accessStatus
       - companyName
       - creationTimestamp
       - dataRequestId
@@ -766,6 +944,8 @@ components:
         dataRequestId:
           type: string
         userId:
+          type: string
+        userEmailAddress:
           type: string
         creationTimestamp:
           type: integer
@@ -783,6 +963,8 @@ components:
           format: int64
         requestStatus:
           $ref: '#/components/schemas/RequestStatus'
+        accessStatus:
+          $ref: '#/components/schemas/AccessStatus'
     AggregatedDataRequest:
       required:
       - count
@@ -801,12 +983,13 @@ components:
           - vsme
           - esg-questionnaire
           - heimathafen
+          - additional-company-information
         reportingPeriod:
           type: string
         datalandCompanyId:
           type: string
         requestStatus:
-          $ref: '#/components/schemas/RequestStatus'
+          type: string
         count:
           type: integer
           format: int64

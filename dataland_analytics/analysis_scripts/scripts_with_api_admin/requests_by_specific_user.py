@@ -1,35 +1,34 @@
-import dataland_datasets.configuration
-import dataland_requests
+import dataland_community
 import dataland_datasets
-from dataland_analytics.config import *
 import pandas as pd
-import time
+
+from dataland_analytics.config import *
 
 user_id = ""
 
 # If only requests of specific time are desired set start and end epoch variables
-# start_epoch = 1715910891000
-# end_epoch = round(time.time() * 1000)
+start_epoch = 1714521600000
+end_epoch = 1717200000000
 
 # noinspection PyInterpreter
 datasets_configuration = dataland_datasets.Configuration(
     host=DATALAND_SERVER + "api", access_token=PERSONAL_USER_API_KEY
 )
 
-requests_configuration = dataland_requests.Configuration(
+requests_configuration = dataland_community.Configuration(
     host=DATALAND_SERVER + "community", access_token=PERSONAL_USER_API_KEY
 )
 
 result_dicts = []
 
-with dataland_requests.ApiClient(requests_configuration) as api_client:
-    api_instance = dataland_requests.RequestControllerApi(api_client)
-    request_list = api_instance.get_data_requests(user_id=user_id)
+with dataland_community.ApiClient(requests_configuration) as api_client:
+    api_instance = dataland_community.RequestControllerApi(api_client)
+    request_list = api_instance.get_data_requests()
     if "start_epoch" in locals():
         request_list = [
             r
             for r in request_list
-            if (r.creation_timestamp > start_epoch and r.creation_timestamp < end_epoch)
+            if (start_epoch < r.creation_timestamp < end_epoch)
         ]
 
 with dataland_datasets.ApiClient(datasets_configuration) as api_client:
